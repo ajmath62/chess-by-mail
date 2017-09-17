@@ -1,0 +1,26 @@
+.board {
+  border: 2px solid black;
+  height: 640px;
+  width: 640px;
+}
+
+.row {
+  height: 80px;
+  width: 640px;
+}
+
+.box {
+  border: 1px solid black;
+  display: inline-block;
+  height: 78px;
+  width: 78px;
+  margin-right: -4px
+}
+
+.box-text {
+  font-size: 54px;
+  height: 54px;
+  width: 78px;
+  padding-top: 8px;
+  text-align: center;
+}
