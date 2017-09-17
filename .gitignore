@@ -1,1 +1,6 @@
+# Local files
 .idea/
+
+# Firebase files
+.firebaserc
+firebase.json
