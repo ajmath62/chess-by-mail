@@ -3,90 +3,97 @@
   <head>
     <meta charset="UTF-8"/>
     <title>Base HTML page</title>
+    <!--Scripts-->
+    <script>var pieceStyle = "letter";</script>
+    <script src="../static/jquery.min.js"></script>
+    <script src="../static/style-options.js"></script>
+    <!--Stylesheets-->
     <link rel="stylesheet" href="../style/base.css">
   </head>
   <body>
     <div class="board">
       <div class="row">
-        <div class="box"><div class="box-text">R</div></div>
-        <div class="box"><div class="box-text">N</div></div>
-        <div class="box"><div class="box-text">B</div></div>
-        <div class="box"><div class="box-text">Q</div></div>
-        <div class="box"><div class="box-text">K</div></div>
-        <div class="box"><div class="box-text">B</div></div>
-        <div class="box"><div class="box-text">N</div></div>
-        <div class="box"><div class="box-text">R</div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-rook"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-knight"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-bishop"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-queen"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-king"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-bishop"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-knight"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-rook"></div></div>
       </div>
       <div class="row">
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
       </div>
       <div class="row">
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
       </div>
       <div class="row">
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
       </div>
       <div class="row">
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
       </div>
       <div class="row">
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
-        <div class="box"><div class="box-text"></div></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
+        <div class="box box-black"></div>
+        <div class="box box-white"></div>
       </div>
       <div class="row">
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
-        <div class="box"><div class="box-text">P</div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
       </div>
       <div class="row">
-        <div class="box"><div class="box-text">R</div></div>
-        <div class="box"><div class="box-text">N</div></div>
-        <div class="box"><div class="box-text">B</div></div>
-        <div class="box"><div class="box-text">Q</div></div>
-        <div class="box"><div class="box-text">K</div></div>
-        <div class="box"><div class="box-text">B</div></div>
-        <div class="box"><div class="box-text">N</div></div>
-        <div class="box"><div class="box-text">R</div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-rook"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-knight"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-bishop"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-queen"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-king"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-bishop"></div></div>
+        <div class="box box-black"><div class="pc pc-letter pc-white pc-knight"></div></div>
+        <div class="box box-white"><div class="pc pc-letter pc-white pc-rook"></div></div>
       </div>
     </div>
+    <br/><br/>
+    <button id="switch-piece-styles" onclick="switchPieceStyles()">Switch to piece symbols</button>
   </body>
 </html>

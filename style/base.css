@@ -17,10 +17,75 @@
   margin-right: -4px
 }
 
-.box-text {
+.box-white {
+  background-color: burlywood;
+}
+
+.box-black {
+  background-color: chocolate;
+}
+
+.box .pc {
   font-size: 54px;
   height: 54px;
   width: 78px;
   padding-top: 8px;
+  padding-bottom: 16px;
   text-align: center;
+}
+
+.pc-white {
+  color: white;
+}
+
+.pc-black {
+  color: black;
+}
+
+.pc-pawn.pc-letter:before {
+  content: "P";
+}
+
+.pc-rook.pc-letter:before {
+  content: "R";
+}
+
+.pc-knight.pc-letter:before {
+  content: "N";
+}
+
+.pc-bishop.pc-letter:before {
+  content: "B";
+}
+
+.pc-queen.pc-letter:before {
+  content: "Q";
+}
+
+.pc-king.pc-letter:before {
+  content: "K";
+}
+
+.pc-pawn.pc-symbol:before {
+  content: "\265F"
+}
+
+.pc-rook.pc-symbol:before {
+  content: "\265C"
+}
+
+.pc-knight.pc-symbol:before {
+  content: "\265E"
+}
+
+.pc-bishop.pc-symbol:before {
+  content: "\265D"
+}
+
+.pc-queen.pc-symbol:before {
+  content: "\265B"
+}
+
+.pc-king.pc-symbol:before {
+  content: "\265A"
 }
