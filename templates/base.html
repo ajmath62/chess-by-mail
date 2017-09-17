@@ -1,99 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
   <head>
     <meta charset="UTF-8"/>
     <title>Base HTML page</title>
+    <!--Javascript libraries-->
+    <script src="../static/libraries/jquery.min.js"></script>
+    <script src="../static/libraries/angular.min.js"></script>
     <!--Scripts-->
     <script>var pieceStyle = "letter";</script>
-    <script src="../static/jquery.min.js"></script>
     <script src="../static/style-options.js"></script>
+    <script src="../static/game-controls.js"></script>
+    <!--Angular-->
+    <script src="../static/controllers/chessboard-controller.js"></script>
     <!--Stylesheets-->
-    <link rel="stylesheet" href="../style/base.css">
+    <link rel="stylesheet" href="../css/base.css">
   </head>
   <body>
-    <div class="board">
-      <div class="row">
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-rook"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-knight"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-bishop"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-queen"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-king"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-bishop"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-knight"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-rook"></div></div>
+    <div ng-controller="ChessboardController as chessboard">
+      <div id="chessboard" class="board">
+        <div ng-repeat="row in chessboard.rows" class="row">
+          <div ng-repeat="column in chessboard.columns" class="box" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even)}">
+            <div ng-if="chessboard.pieces[column + row]" class="pc" ng-class="chessboard.pieces[column + row] + ' ' + chessboard.pieceStyle"></div>
+          </div>
+        </div>
       </div>
-      <div class="row">
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-black pc-pawn"></div></div>
-      </div>
-      <div class="row">
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-      </div>
-      <div class="row">
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-      </div>
-      <div class="row">
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-      </div>
-      <div class="row">
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-        <div class="box box-black"></div>
-        <div class="box box-white"></div>
-      </div>
-      <div class="row">
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-pawn"></div></div>
-      </div>
-      <div class="row">
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-rook"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-knight"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-bishop"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-queen"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-king"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-bishop"></div></div>
-        <div class="box box-black"><div class="pc pc-letter pc-white pc-knight"></div></div>
-        <div class="box box-white"><div class="pc pc-letter pc-white pc-rook"></div></div>
-      </div>
+      <br/><br/>
+      <button id="switch-piece-styles" ng-click="chessboard.switchPieceStyles()">Switch to piece symbols</button>
     </div>
-    <br/><br/>
-    <button id="switch-piece-styles" onclick="switchPieceStyles()">Switch to piece symbols</button>
   </body>
 </html>

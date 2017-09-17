@@ -14,14 +14,13 @@
   display: inline-block;
   height: 78px;
   width: 78px;
-  margin-right: -4px
 }
 
-.box-white {
+.box.white {
   background-color: burlywood;
 }
 
-.box-black {
+.box.black {
   background-color: chocolate;
 }
 
@@ -34,58 +33,58 @@
   text-align: center;
 }
 
-.pc-white {
+.pc.white {
   color: white;
 }
 
-.pc-black {
+.pc.black {
   color: black;
 }
 
-.pc-pawn.pc-letter:before {
+.pc.pawn.letter:before {
   content: "P";
 }
 
-.pc-rook.pc-letter:before {
+.pc.rook.letter:before {
   content: "R";
 }
 
-.pc-knight.pc-letter:before {
+.pc.knight.letter:before {
   content: "N";
 }
 
-.pc-bishop.pc-letter:before {
+.pc.bishop.letter:before {
   content: "B";
 }
 
-.pc-queen.pc-letter:before {
+.pc.queen.letter:before {
   content: "Q";
 }
 
-.pc-king.pc-letter:before {
+.pc.king.letter:before {
   content: "K";
 }
 
-.pc-pawn.pc-symbol:before {
-  content: "\265F"
+.pc.pawn.symbol:before {
+  content: "\265F";
 }
 
-.pc-rook.pc-symbol:before {
-  content: "\265C"
+.pc.rook.symbol:before {
+  content: "\265C";
 }
 
-.pc-knight.pc-symbol:before {
-  content: "\265E"
+.pc.knight.symbol:before {
+  content: "\265E";
 }
 
-.pc-bishop.pc-symbol:before {
-  content: "\265D"
+.pc.bishop.symbol:before {
+  content: "\265D";
 }
 
-.pc-queen.pc-symbol:before {
-  content: "\265B"
+.pc.queen.symbol:before {
+  content: "\265B";
 }
 
-.pc-king.pc-symbol:before {
-  content: "\265A"
+.pc.king.symbol:before {
+  content: "\265A";
 }
