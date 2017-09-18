@@ -9,28 +9,34 @@
   width: 640px;
 }
 
-.box {
+.square {
   border: 1px solid black;
   display: inline-block;
   height: 78px;
   width: 78px;
 }
 
-.box.white {
+.square.white {
   background-color: burlywood;
 }
 
-.box.black {
+.square.black {
   background-color: chocolate;
 }
 
-.box .pc {
+.square.selected {
+  background-color: lightblue;
+}
+
+.square .pc {
   font-size: 54px;
   height: 54px;
   width: 78px;
   padding-top: 8px;
-  padding-bottom: 16px;
+  padding-bottom: 89px;
   text-align: center;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 .pc.white {

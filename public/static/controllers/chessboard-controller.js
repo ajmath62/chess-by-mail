@@ -15,7 +15,7 @@
         "H7": "black pawn", "A8": "black rook", "B8": "black knight", "C8": "black bishop",
         "D8": "black queen", "E8": "black king", "F8": "black bishop", "G8": "black knight",
         "H8": "black rook"};  // Starting position
-        chessboard.pieceStyle = "letter";
+        chessboard.pieceStyle = "symbol";
 
         chessboard.switchPieceStyles = function() {
             if (chessboard.pieceStyle == "letter") {
@@ -25,6 +25,31 @@
             else if (chessboard.pieceStyle == "symbol") {
                 chessboard.pieceStyle = "letter";
                 $("#switch-piece-styles").text("Switch to piece symbols");
+            }
+        };
+
+        chessboard.firstClick = null;
+        chessboard.clickSquare = function(squareName) {
+            if (chessboard.firstClick === null) {
+                // If there is a piece on the chosen square, mark the square as selected
+                if (chessboard.pieces[squareName]) {
+                    chessboard.firstClick = squareName;
+                    $("#" + squareName).addClass("selected");
+                }
+            }
+            else {
+                // Attempt to move the previously selected piece to the newly chosen square
+                piece_type = chessboard.pieces[chessboard.firstClick];
+                // Basic behavior: move the piece there regardless of legality
+                isMoveValid = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName);
+                if (isMoveValid) {
+                    // Move the piece, capturing if necessary
+                    delete chessboard.pieces[chessboard.firstClick];
+                    chessboard.pieces[squareName] = piece_type;
+                }
+                // Whether the move is valid or not, deselect the piece.
+                $("#" + chessboard.firstClick).removeClass("selected");
+                chessboard.firstClick = null;
             }
         };
 

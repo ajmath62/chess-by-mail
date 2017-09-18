@@ -7,7 +7,7 @@
     <script src="static/libraries/jquery.min.js"></script>
     <script src="static/libraries/angular.min.js"></script>
     <!--Scripts-->
-    <script>var pieceStyle = "letter";</script>
+    <script src="static/chess-utils.js"></script>
     <script src="static/game-controls.js"></script>
     <!--Angular-->
     <script src="static/controllers/chessboard-controller.js"></script>
@@ -18,13 +18,13 @@
     <div ng-controller="ChessboardController as chessboard">
       <div id="chessboard" class="board">
         <div ng-repeat="row in chessboard.rows" class="row">
-          <div ng-repeat="column in chessboard.columns" class="box" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even)}">
+          <div id="{{ column + row }}" ng-repeat="column in chessboard.columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even)}" ng-click="chessboard.clickSquare(column + row)">
             <div ng-if="chessboard.pieces[column + row]" class="pc" ng-class="chessboard.pieces[column + row] + ' ' + chessboard.pieceStyle"></div>
           </div>
         </div>
       </div>
       <br/><br/>
-      <button id="switch-piece-styles" ng-click="chessboard.switchPieceStyles()">Switch to piece symbols</button>
+      <button id="switch-piece-styles" ng-click="chessboard.switchPieceStyles()">Switch to piece letter abbreviations</button>
     </div>
   </body>
 </html>
