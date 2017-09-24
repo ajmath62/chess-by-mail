@@ -62,7 +62,15 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
             return contains(startSquare, 2) && !boardState[endSquare] && !boardState[getNeighboringSquare(startSquare, [0, 1])];
         case "1,1":
         case "-1,1":
-            return contains(boardState[endSquare], "black");
+            if (contains(boardState[endSquare], "black"))
+                return true;
+            else if ($scope.lastMove[0] === getNeighboringSquare(endSquare, [0, 1])
+                && $scope.lastMove[1] === getNeighboringSquare(endSquare, [0, -1])
+                && boardState[getNeighboringSquare(endSquare, [0, -1])] === "black pawn")
+                // The last move was a pawn move over the square where this pawn is moving
+                return [true, "enpassant-white"];
+            else
+                return false;
         default:
             return false;
         }
@@ -74,8 +82,15 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
             return contains(startSquare, 7) && !boardState[endSquare] && !boardState[getNeighboringSquare(startSquare, [0, -1])];
         case "1,-1":
         case "-1,-1":
-            return contains(boardState[endSquare], "white");
-        // AJK TODO need to include en passant (requires holding on to the previous move)
+            if (contains(boardState[endSquare], "white"))
+                return true;
+            else if ($scope.lastMove[0] === getNeighboringSquare(endSquare, [0, -1])
+                && $scope.lastMove[1] === getNeighboringSquare(endSquare, [0, 1])
+                && boardState[getNeighboringSquare(endSquare, [0, 1])] === "white pawn")
+                // The last move was a pawn move over the square where this pawn is moving
+                return [true, "enpassant-black"];
+            else
+                return false;
         default:
             return false;
         }

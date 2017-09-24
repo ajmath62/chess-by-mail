@@ -49,6 +49,13 @@
                         makeMove(getNeighboringSquare(squareName, [1, 0]), getNeighboringSquare(squareName, [-1, 0]));
                     else if (comments === "castle-queen")
                         makeMove(getNeighboringSquare(squareName, [-2, 0]), getNeighboringSquare(squareName, [1, 0]));
+                    // If the move was en passant, delete the captured pawn
+                    else if (comments === "enpassant-white") {
+                        delete $scope.pieces[getNeighboringSquare(squareName, [0, -1])];
+                    }
+                    else if (comments === "enpassant-black") {
+                        delete $scope.pieces[getNeighboringSquare(squareName, [0, 1])];
+                    }
                 }
                 else {
                     [errorType, errorDetails] = comments;
