@@ -16,6 +16,7 @@
   </head>
   <body>
     <div ng-controller="ChessboardController as chessboard">
+      <h2>{{ chessboard.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
       <div id="chessboard" class="board">
         <div ng-repeat="row in chessboard.rows" class="row">
           <div id="{{ column + row }}" ng-repeat="column in chessboard.columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even)}" ng-click="chessboard.clickSquare(column + row)">

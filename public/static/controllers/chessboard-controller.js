@@ -17,6 +17,7 @@
         "H8": "black rook"};  // Starting position
         chessboard.pieceStyle = "symbol";
         chessboard.currentPlayer = "white";
+        chessboard.castleLegality = {"white": {"A": true, "H": true}, "black": {"A": true, "H": true}};
 
         chessboard.switchPieceStyles = function() {
             if (chessboard.pieceStyle == "letter") {
@@ -41,24 +42,32 @@
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
                 pieceType = chessboard.pieces[chessboard.firstClick];
-                [moveValidity, error] = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName, chessboard.currentPlayer);
+                [moveValidity, comments] = checkMoveValidity(chessboard, squareName);
                 if (moveValidity) {
                     makeMove(chessboard.pieces, chessboard.firstClick, squareName);
                     if (checkPromotion(chessboard.pieces, squareName)) {
-                    chessboard.promotablePawn = squareName;
-                    $("#promotion-prompt").show();
+                        chessboard.promotablePawn = squareName;
+                        $("#promotion-prompt").show();
                     }
                     else
                         // If there is a promotion, flip whose turn it is after selecting which
                         // piece to promote to. Otherwise, flip whose turn it is now.
                         chessboard.currentPlayer = getOtherColor(chessboard.currentPlayer);
+
+                    // If the move was a castle, move the rook
+                    if (comments === "castle-king")
+                        makeMove(chessboard.pieces, getNeighboringSquare(squareName, [1, 0]), getNeighboringSquare(squareName, [-1, 0]));
+                    else if (comments === "castle-queen")
+                        makeMove(chessboard.pieces, getNeighboringSquare(squareName, [-2, 0]), getNeighboringSquare(squareName, [1, 0]));
                 }
                 else {
-                    [errorType, errorDetails] = error;
+                    [errorType, errorDetails] = comments;
                     if (errorType === "check") {
-                        fromSquare = errorDetails;
+                        [fromSquare, toSquare] = errorDetails;
                         $("#" + fromSquare).addClass("warning");
+                        setTimeout(function(){$("#" + toSquare).addClass("warning");}, 400)
                         setTimeout(function(){$("#" + fromSquare).removeClass("warning");}, 400)
+                        setTimeout(function(){$("#" + toSquare).removeClass("warning");}, 800)
                     }
                 }
                 // Whether the move is valid or not, deselect the piece.

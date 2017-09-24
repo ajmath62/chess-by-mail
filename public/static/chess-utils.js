@@ -47,7 +47,7 @@ function getOtherColor(color) {
         return "white";
 }
 
-function isPieceMovable(boardState, startSquare, endSquare) {
+function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
     pieceType = boardState[startSquare];
     pieceColor = pieceType.split(" ")[0];
     moveDistance = getSquareDistance(startSquare, endSquare);
@@ -174,8 +174,50 @@ function isPieceMovable(boardState, startSquare, endSquare) {
         case "-1,-1":
         case "-1,0":
         case "-1,1":
-            return !contains(boardState[endSquare], pieceColor);
-        // AJK TODO include castling---mark king and rook as pristine/dirty
+            if (contains(boardState[endSquare], pieceColor))
+                return false;
+            else {
+                return true;
+            }
+        case "2,0":
+            if (!castleLegality.H)
+                return false;
+            // Make sure there are no squares between the king and the rook
+            else if (boardState[getNeighboringSquare(startSquare, [1, 0])]
+                    || boardState[getNeighboringSquare(startSquare, [2, 0])])
+                return false;
+            else {
+                threatColor = getOtherColor(pieceType.split(" ")[0]);
+                // Check that there are no threats to the king, the rook, or the square the rook is moving to
+                // Don't look at the square the king is moving to, that gets looked at later
+                for (let moveDistance of [[0, 0], [1, 0], [3, 0]]) {
+                    squareToCheck = getNeighboringSquare(startSquare, moveDistance)
+                    threatSquare = checkThreat(boardState, squareToCheck, threatColor);
+                    if (threatSquare)
+                        return [false, ["check", [threatSquare, squareToCheck]]];
+                }
+            }
+            return [true, "castle-queen"];
+        case "-2,0":
+            if (!castleLegality.A)
+                return false;
+            // Make sure there are no squares between the king and the rook
+            else if (boardState[getNeighboringSquare(startSquare, [-1, 0])]
+                    || boardState[getNeighboringSquare(startSquare, [-2, 0])]
+                    || boardState[getNeighboringSquare(startSquare, [-3, 0])])
+                return false;
+            else {
+                threatColor = getOtherColor(pieceType.split(" ")[0]);
+                // Check that there are no threats to the king, the rook, or the square the rook is moving to
+                // Don't look at the square the king is moving to, that gets looked at later
+                for (let moveDistance of [[0, 0], [-1, 0], [-4, 0]]) {
+                    squareToCheck = getNeighboringSquare(startSquare, moveDistance)
+                    threatSquare = checkThreat(boardState, squareToCheck, threatColor);
+                    if (threatSquare)
+                        return [false, ["check", [threatSquare, squareToCheck]]];
+                }
+            }
+            return [true, "castle-queen"];
         default:
             return false;
         }
@@ -184,32 +226,49 @@ function isPieceMovable(boardState, startSquare, endSquare) {
     }
 }
 
-function checkCheck(boardState, color) {
-    [kingLoc] = findPiece(boardState, color + " king");
-    otherColor = getOtherColor(color)
+function checkThreat(boardState, square, color) {
+    // Check if there is a threat to the given square from the given color
+
+    // A king can't threaten from two spaces away
+    castleLegality = {"A": false, "H": false}
 
     for (let pieceName of pieceNameList) {
-        pieceType = otherColor + " " + pieceName;
+        pieceType = color + " " + pieceName;
         for (let pieceLoc of findPiece(boardState, pieceType)) {
-            // If any piece is attacking the king, return its location
-            if (isPieceMovable(boardState, pieceLoc, kingLoc))
+            // If any piece is threatening the square, return its location
+            if (isPieceMovable(boardState, pieceLoc, square, castleLegality))
                 return pieceLoc;
         }
     }
 
-    // If there is no check
+    // If there is no threat
     return "";
 }
 
-function checkMoveValidity(boardState, startSquare, endSquare, currentPlayer) {
+function checkCheck(boardState, color) {
+    [kingLoc] = findPiece(boardState, color + " king");
+    otherColor = getOtherColor(color)
+    return checkThreat(boardState, kingLoc, otherColor);
+}
+
+function checkMoveValidity(boardInfo, endSquare) {
+    // AJK TODO make this stuff more global
+    boardState = boardInfo.pieces;
+    startSquare = boardInfo.firstClick;
+    currentPlayer = boardInfo.currentPlayer;
+    castleLegality = boardInfo.castleLegality[currentPlayer];
+
     if (boardState[startSquare].split(" ")[0] !== currentPlayer)
         // A player can only move their own pieces
-        // AJK TODO display an indicator of whose turn it is
         return [false, ["turn", null]];
 
-    if (!isPieceMovable(boardState, startSquare, endSquare))
-        // Make sure a piece can actually make the move specified
+    // Make sure a piece can actually make the move specified
+    moveLegality = isPieceMovable(boardState, startSquare, endSquare, castleLegality)
+    if (!moveLegality)
         return [false, ["illegal", null]];
+    else if (moveLegality[0] === false)
+        // Pass along any comments from isPieceMovable
+        return [false, moveLegality[1]];
 
     // Test out the move before actually making it to see if any issues arise
     boardCopy = {};
@@ -217,12 +276,32 @@ function checkMoveValidity(boardState, startSquare, endSquare, currentPlayer) {
         boardCopy[square] = pieceType;
     makeMove(boardCopy, startSquare, endSquare);
     checkingSquare = checkCheck(boardCopy, currentPlayer);
+    kingSquare = findPiece(boardCopy, currentPlayer + " king")
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
-        return [false, ["check", checkingSquare]];
+        return [false, ["check", [checkingSquare, kingSquare]]];
 
-    // If the move is valid according to all the above tests
-    return [true, null];
+    // If any kings were moved, don't allow future castling for that player
+    // If any rooks were moved or captured, don't allow future castling on that side
+    // AJK TODO make this a subroutine, please
+    if (startSquare === "A1" || endSquare === "A1")
+        boardInfo.castleLegality.white.A = false;
+    if (startSquare === "H1" || endSquare === "H1")
+        boardInfo.castleLegality.white.H = false;
+    if (startSquare === "A8" || endSquare === "A8")
+        boardInfo.castleLegality.black.A = false;
+    if (startSquare === "H8" || endSquare === "H8")
+        boardInfo.castleLegality.black.H = false;
+    if (boardState[startSquare] === "white king") {
+        boardInfo.castleLegality.white.A = false;
+        boardInfo.castleLegality.white.H = false;
+    }
+    if (boardState[startSquare] === "black king") {
+        boardInfo.castleLegality.black.A = false;
+        boardInfo.castleLegality.black.H = false;
+    }
+    // Allow the move to be made and pass along any comments from isPieceMovable
+    return [true, moveLegality[1]];
 }
 
 function makeMove(boardState, startSquare, endSquare) {
