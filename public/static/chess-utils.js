@@ -1,3 +1,5 @@
+pieceNameList = ["pawn", "rook", "knight", "bishop", "queen", "king"];
+
 function contains(array, object){
     // Return true if array exists and is indexable and contains object
     return Boolean(array && array.indexOf && array.indexOf(object) !== -1);
@@ -28,10 +30,21 @@ function getSquareDistance(startSquare, endSquare) {
     return [numColumns, numRows];
 }
 
-function checkMoveValidity(boardState, startSquare, endSquare) {
-    moveDistance = getSquareDistance(startSquare, endSquare)
-    pieceType = boardState[startSquare]
-    pieceColor = pieceType.split(" ")[0]
+function findPiece(boardState, pieceType) {
+    // This returns a list, regardless of whether the piece is unique or not
+    squareList = [];
+    for (let [square, piece] of Object.entries(boardState)) {
+        if (piece === pieceType)
+            squareList.push(square);
+    }
+    return squareList;
+}
+
+function isPieceMovable(boardState, startSquare, endSquare) {
+    pieceType = boardState[startSquare];
+    pieceColor = pieceType.split(" ")[0];
+    moveDistance = getSquareDistance(startSquare, endSquare);
+
     switch (pieceType) {
     case "white pawn":
         switch (moveDistance.join(",")) {
@@ -166,4 +179,45 @@ function checkMoveValidity(boardState, startSquare, endSquare) {
     default:
         return true;
     }
+}
+
+function checkCheck(boardState, color) {
+    [kingLoc] = findPiece(boardState, color + " king");
+    if (color === "white")
+        otherColor = "black ";
+    else if (color === "black")
+        otherColor = "white ";
+
+    for (let pieceName of pieceNameList) {
+        pieceType = otherColor + pieceName;
+        for (let pieceLoc of findPiece(boardState, pieceType)) {
+            if (isPieceMovable(boardState, pieceLoc, kingLoc))
+                return pieceLoc;
+        }
+    }
+}
+
+function checkMoveValidity(boardState, startSquare, endSquare) {
+    playerColor = boardState[startSquare].split(" ")[0];
+    // Test out the move before actually making it to see if any issues arise
+    boardCopy = {};
+    for (let [square, pieceType] of Object.entries(boardState))
+        boardCopy[square] = pieceType;
+    makeMove(boardCopy, startSquare, endSquare);
+    if (checkCheck(boardCopy, playerColor))
+        // Don't let a player make a move that will put them in check or leave them in check
+        // AJK TODO color the piece that will make the check red
+        return false;
+    else if (isPieceMovable(boardState, startSquare, endSquare))
+        // Make sure a piece can actually make the move specified
+        return true;
+    else
+        return false;
+}
+
+function makeMove(boardState, startSquare, endSquare) {
+    // Move the piece, capturing if necessary
+    pieceType = boardState[startSquare];
+    delete boardState[startSquare];
+    boardState[endSquare] = pieceType;
 }

@@ -39,13 +39,10 @@
             }
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
-                piece_type = chessboard.pieces[chessboard.firstClick];
-                // Basic behavior: move the piece there regardless of legality
-                isMoveValid = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName);
-                if (isMoveValid) {
-                    // Move the piece, capturing if necessary
-                    delete chessboard.pieces[chessboard.firstClick];
-                    chessboard.pieces[squareName] = piece_type;
+                pieceType = chessboard.pieces[chessboard.firstClick];
+                moveValidity = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName);
+                if (moveValidity) {
+                    makeMove(chessboard.pieces, chessboard.firstClick, squareName)
                 }
                 // Whether the move is valid or not, deselect the piece.
                 $("#" + chessboard.firstClick).removeClass("selected");
