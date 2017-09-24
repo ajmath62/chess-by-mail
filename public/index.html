@@ -15,26 +15,29 @@
     <link rel="stylesheet" href="css/base.css">
   </head>
   <body>
-    <div ng-controller="ChessboardController as chessboard">
-      <h2>{{ chessboard.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
+    <div ng-controller="ChessboardController">
+      <h2>{{ currentPlayer === "white" ? "White" : "Black" }} to play</h2>
       <div id="chessboard" class="board">
-        <div ng-repeat="row in chessboard.rows" class="row">
-          <div id="{{ column + row }}" ng-repeat="column in chessboard.columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even)}" ng-click="chessboard.clickSquare(column + row)">
-            <div ng-if="chessboard.pieces[column + row]" class="pc" ng-class="chessboard.pieces[column + row] + ' ' + chessboard.pieceStyle"></div>
+        <div ng-repeat="row in rows" class="row">
+          <div id="{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
+            <div ng-if="pieces[column + row]" class="pc" ng-class="[pieces[column + row], pieceStyle]"></div>
           </div>
         </div>
       </div>
-      <div id="promotion-prompt" hidden>
+      <div id="promotion-prompt" ng-if="promotablePawn">
         <br/>
         <p>You have promoted! Which piece would you like to promote to?</p>
         <div class="row">
-          <div ng-repeat="pieceName in ['knight', 'bishop', 'rook', 'queen']" class="square white" ng-click="chessboard.promote(pieceName)">
-            <div class="pc" ng-class="pieceName + ' ' + chessboard.currentPlayer + ' ' + chessboard.pieceStyle"></div>
+          <div ng-repeat="pieceName in ['knight', 'bishop', 'rook', 'queen']" class="square white" ng-click="promote(pieceName)">
+            <div class="pc" ng-class="[currentPlayer, pieceName, pieceStyle]"></div>
           </div>
         </div>
       </div>
       <br/><br/>
-      <button id="switch-piece-styles" ng-click="chessboard.switchPieceStyles()">Switch to piece letter abbreviations</button>
+      <div>
+        <label><input type="radio" ng-model="pieceStyle" value="symbol"/>Use piece symbols</label>
+        <label><input type="radio" ng-model="pieceStyle" value="letter"/>Use piece letter abbreviations</label>
+      </div>
     </div>
   </body>
 </html>
