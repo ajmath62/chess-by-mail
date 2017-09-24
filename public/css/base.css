@@ -24,6 +24,10 @@
   background-color: chocolate;
 }
 
+.square.last-move {
+  background-color: cadetblue;
+}
+
 .square.selected {
   background-color: lightblue;
 }

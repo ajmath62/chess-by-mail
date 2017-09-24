@@ -16,6 +16,7 @@
         "D8": "black queen", "E8": "black king", "F8": "black bishop", "G8": "black knight",
         "H8": "black rook"};  // Starting position
         chessboard.pieceStyle = "symbol";
+        chessboard.lastMove = ["A1", "A1"];
         chessboard.currentPlayer = "white";
         chessboard.castleLegality = {"white": {"A": true, "H": true}, "black": {"A": true, "H": true}};
 
@@ -45,6 +46,12 @@
                 [moveValidity, comments] = checkMoveValidity(chessboard, squareName);
                 if (moveValidity) {
                     makeMove(chessboard.pieces, chessboard.firstClick, squareName);
+                    $("#" + chessboard.lastMove[0]).removeClass("last-move")
+                    $("#" + chessboard.lastMove[1]).removeClass("last-move")
+                    chessboard.lastMove = [chessboard.firstClick, squareName];
+                    $("#" + chessboard.lastMove[0]).addClass("last-move")
+                    $("#" + chessboard.lastMove[1]).addClass("last-move")
+
                     if (checkPromotion(chessboard.pieces, squareName)) {
                         chessboard.promotablePawn = squareName;
                         $("#promotion-prompt").show();

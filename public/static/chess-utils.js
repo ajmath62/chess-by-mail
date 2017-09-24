@@ -197,7 +197,7 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
                         return [false, ["check", [threatSquare, squareToCheck]]];
                 }
             }
-            return [true, "castle-queen"];
+            return [true, "castle-king"];
         case "-2,0":
             if (!castleLegality.A)
                 return false;
