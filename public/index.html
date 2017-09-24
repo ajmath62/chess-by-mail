@@ -7,15 +7,22 @@
     <script src="static/libraries/jquery.min.js"></script>
     <script src="static/libraries/angular.min.js"></script>
     <!--Scripts-->
+    <script src="static/position-encoding.js"></script>
     <script src="static/chess-utils.js"></script>
-    <script src="static/game-controls.js"></script>
     <!--Angular-->
+    <script src="static/controllers/game-controller.js"></script>
     <script src="static/controllers/chessboard-controller.js"></script>
     <!--Stylesheets-->
     <link rel="stylesheet" href="css/base.css">
   </head>
   <body>
-    <div ng-controller="ChessboardController">
+    <!--AJK TODO box for inputting/outputting the game hash, instructions saying what it does, hide everything else when input is selected-->
+    <div id="game-controller" ng-controller="GameController">
+      <h2>Game description string</h2>
+      <input type="text" ng-model="hash" size="60"/>
+      <button type="submit" ng-click="openGame()">Open game</button>
+    </div>
+    <div id="chessboard-controller" ng-controller="ChessboardController">
       <h2>{{ currentPlayer === "white" ? "White" : "Black" }} to play</h2>
       <div id="chessboard" class="board">
         <div ng-repeat="row in rows" class="row">

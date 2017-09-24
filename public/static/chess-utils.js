@@ -1,5 +1,4 @@
 pieceNameList = ["pawn", "rook", "knight", "bishop", "queen", "king"];
-$scope = {};
 
 function contains(array, object){
     // Return true if array exists and is indexable and contains object
@@ -64,8 +63,8 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
         case "-1,1":
             if (contains(boardState[endSquare], "black"))
                 return true;
-            else if ($scope.lastMove[0] === getNeighboringSquare(endSquare, [0, 1])
-                && $scope.lastMove[1] === getNeighboringSquare(endSquare, [0, -1])
+            else if (chessScope.lastMove[0] === getNeighboringSquare(endSquare, [0, 1])
+                && chessScope.lastMove[1] === getNeighboringSquare(endSquare, [0, -1])
                 && boardState[getNeighboringSquare(endSquare, [0, -1])] === "black pawn")
                 // The last move was a pawn move over the square where this pawn is moving
                 return [true, "enpassant-white"];
@@ -84,8 +83,8 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
         case "-1,-1":
             if (contains(boardState[endSquare], "white"))
                 return true;
-            else if ($scope.lastMove[0] === getNeighboringSquare(endSquare, [0, -1])
-                && $scope.lastMove[1] === getNeighboringSquare(endSquare, [0, 1])
+            else if (chessScope.lastMove[0] === getNeighboringSquare(endSquare, [0, -1])
+                && chessScope.lastMove[1] === getNeighboringSquare(endSquare, [0, 1])
                 && boardState[getNeighboringSquare(endSquare, [0, 1])] === "white pawn")
                 // The last move was a pawn move over the square where this pawn is moving
                 return [true, "enpassant-black"];
@@ -275,16 +274,15 @@ function checkCheck(boardState, color) {
 }
 
 function checkMoveValidity(startSquare, endSquare) {
-    $scope = window.angular.element($("#chessboard")).scope()
-    var currentPlayer = $scope.currentPlayer;
-    var castleLegality = $scope.castleLegality[currentPlayer];
+    var currentPlayer = chessScope.currentPlayer;
+    var castleLegality = chessScope.castleLegality[currentPlayer];
 
-    if ($scope.pieces[startSquare].split(" ")[0] !== currentPlayer)
+    if (chessScope.pieces[startSquare].split(" ")[0] !== currentPlayer)
         // A player can only move their own pieces
         return [false, ["turn", null]];
 
     // Make sure a piece can actually make the move specified
-    var moveLegality = isPieceMovable($scope.pieces, startSquare, endSquare, castleLegality)
+    var moveLegality = isPieceMovable(chessScope.pieces, startSquare, endSquare, castleLegality)
     if (!moveLegality)
         return [false, ["illegal", null]];
     else if (moveLegality[0] === false)
@@ -293,11 +291,12 @@ function checkMoveValidity(startSquare, endSquare) {
 
     // Test out the move before actually making it to see if any issues arise
     var boardCopy = {};
-    for (let [square, pieceType] of Object.entries($scope.pieces))
+    for (let [square, pieceType] of Object.entries(chessScope.pieces))
         boardCopy[square] = pieceType;
     makeTestMove(boardCopy, startSquare, endSquare);
     var checkingSquare = checkCheck(boardCopy, currentPlayer);
     var kingSquare = findPiece(boardCopy, currentPlayer + " king")
+    // AJK TODO alert the user if there is checkmate
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];
@@ -306,20 +305,20 @@ function checkMoveValidity(startSquare, endSquare) {
     // If any rooks were moved or captured, don't allow future castling on that side
     // AJK TODO make this a subroutine, please
     if (startSquare === "A1" || endSquare === "A1")
-        $scope.castleLegality.white.A = false;
+        chessScope.castleLegality.white.A = false;
     if (startSquare === "H1" || endSquare === "H1")
-        $scope.castleLegality.white.H = false;
+        chessScope.castleLegality.white.H = false;
     if (startSquare === "A8" || endSquare === "A8")
-        $scope.castleLegality.black.A = false;
+        chessScope.castleLegality.black.A = false;
     if (startSquare === "H8" || endSquare === "H8")
-        $scope.castleLegality.black.H = false;
-    if ($scope.pieces[startSquare] === "white king") {
-        $scope.castleLegality.white.A = false;
-        $scope.castleLegality.white.H = false;
+        chessScope.castleLegality.black.H = false;
+    if (chessScope.pieces[startSquare] === "white king") {
+        chessScope.castleLegality.white.A = false;
+        chessScope.castleLegality.white.H = false;
     }
-    if ($scope.pieces[startSquare] === "black king") {
-        $scope.castleLegality.black.A = false;
-        $scope.castleLegality.black.H = false;
+    if (chessScope.pieces[startSquare] === "black king") {
+        chessScope.castleLegality.black.A = false;
+        chessScope.castleLegality.black.H = false;
     }
     // Allow the move to be made and pass along any comments from isPieceMovable
     return [true, moveLegality[1]];
@@ -327,14 +326,14 @@ function checkMoveValidity(startSquare, endSquare) {
 
 function makeMove(startSquare, endSquare) {
     // Move the piece, capturing if necessary
-    var pieceType = $scope.pieces[startSquare];
-    delete $scope.pieces[startSquare];
-    $scope.pieces[endSquare] = pieceType;
+    var pieceType = chessScope.pieces[startSquare];
+    delete chessScope.pieces[startSquare];
+    chessScope.pieces[endSquare] = pieceType;
 }
 
 function checkPromotion() {
-    var boardState = $scope.pieces;
-    var square = $scope.lastMove[1];
+    var boardState = chessScope.pieces;
+    var square = chessScope.lastMove[1];
     // Return true if the piece is a pawn on its last rank and false otherwise
     [pieceColor, pieceName] = boardState[square].split(" ");
     if (((pieceColor === "white" && square[1] == 8) || (pieceColor === "black" && square[1] == 1)) && pieceName === "pawn")
