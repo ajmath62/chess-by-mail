@@ -191,28 +191,34 @@ function checkCheck(boardState, color) {
     for (let pieceName of pieceNameList) {
         pieceType = otherColor + pieceName;
         for (let pieceLoc of findPiece(boardState, pieceType)) {
+            // If any piece is attacking the king, return its location
             if (isPieceMovable(boardState, pieceLoc, kingLoc))
                 return pieceLoc;
         }
     }
+
+    // If there is no check
+    return "";
 }
 
 function checkMoveValidity(boardState, startSquare, endSquare) {
+    if (!isPieceMovable(boardState, startSquare, endSquare))
+        // Make sure a piece can actually make the move specified
+        return [false, ["illegal", null]];
+
     playerColor = boardState[startSquare].split(" ")[0];
     // Test out the move before actually making it to see if any issues arise
     boardCopy = {};
     for (let [square, pieceType] of Object.entries(boardState))
         boardCopy[square] = pieceType;
     makeMove(boardCopy, startSquare, endSquare);
-    if (checkCheck(boardCopy, playerColor))
+    checkingSquare = checkCheck(boardCopy, playerColor);
+    if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
-        // AJK TODO color the piece that will make the check red
-        return false;
-    else if (isPieceMovable(boardState, startSquare, endSquare))
-        // Make sure a piece can actually make the move specified
-        return true;
-    else
-        return false;
+        return [false, ["check", checkingSquare]];
+
+    // If the move is valid according to all the above tests
+    return [true, null];
 }
 
 function makeMove(boardState, startSquare, endSquare) {

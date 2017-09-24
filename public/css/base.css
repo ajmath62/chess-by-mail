@@ -28,6 +28,10 @@
   background-color: lightblue;
 }
 
+.square.warning {
+  background-color: brown;
+}
+
 .square .pc {
   font-size: 54px;
   height: 54px;

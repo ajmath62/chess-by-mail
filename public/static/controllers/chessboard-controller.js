@@ -40,9 +40,17 @@
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
                 pieceType = chessboard.pieces[chessboard.firstClick];
-                moveValidity = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName);
+                [moveValidity, error] = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName);
                 if (moveValidity) {
-                    makeMove(chessboard.pieces, chessboard.firstClick, squareName)
+                    makeMove(chessboard.pieces, chessboard.firstClick, squareName);
+                }
+                else {
+                    [errorType, errorDetails] = error;
+                    if (errorType === "check") {
+                        fromSquare = errorDetails;
+                        $("#" + fromSquare).addClass("warning");
+                        setTimeout(function(){$("#" + fromSquare).removeClass("warning");}, 400)
+                    }
                 }
                 // Whether the move is valid or not, deselect the piece.
                 $("#" + chessboard.firstClick).removeClass("selected");
