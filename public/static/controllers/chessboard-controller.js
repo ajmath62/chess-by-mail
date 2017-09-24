@@ -16,6 +16,7 @@
         "D8": "black queen", "E8": "black king", "F8": "black bishop", "G8": "black knight",
         "H8": "black rook"};  // Starting position
         chessboard.pieceStyle = "symbol";
+        chessboard.currentPlayer = "white";
 
         chessboard.switchPieceStyles = function() {
             if (chessboard.pieceStyle == "letter") {
@@ -40,9 +41,17 @@
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
                 pieceType = chessboard.pieces[chessboard.firstClick];
-                [moveValidity, error] = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName);
+                [moveValidity, error] = checkMoveValidity(chessboard.pieces, chessboard.firstClick, squareName, chessboard.currentPlayer);
                 if (moveValidity) {
                     makeMove(chessboard.pieces, chessboard.firstClick, squareName);
+                    if (checkPromotion(chessboard.pieces, squareName)) {
+                    chessboard.promotablePawn = squareName;
+                    $("#promotion-prompt").show();
+                    }
+                    else
+                        // If there is a promotion, flip whose turn it is after selecting which
+                        // piece to promote to. Otherwise, flip whose turn it is now.
+                        chessboard.currentPlayer = getOtherColor(chessboard.currentPlayer);
                 }
                 else {
                     [errorType, errorDetails] = error;
@@ -58,5 +67,11 @@
             }
         };
 
+        chessboard.promote = function(pieceName) {
+            // AJK TODO prevent the player from doing anything else in the meanwhile
+            chessboard.pieces[chessboard.promotablePawn] = chessboard.currentPlayer + " " + pieceName;
+            chessboard.currentPlayer = getOtherColor(chessboard.currentPlayer);
+            $("#promotion-prompt").hide();
+        }
     });
 }());

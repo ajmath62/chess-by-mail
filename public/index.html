@@ -23,6 +23,15 @@
           </div>
         </div>
       </div>
+      <div id="promotion-prompt" hidden>
+        <br/>
+        <p>You have promoted! Which piece would you like to promote to?</p>
+        <div class="row">
+          <div ng-repeat="pieceName in ['knight', 'bishop', 'rook', 'queen']" class="square white" ng-click="chessboard.promote(pieceName)">
+            <div class="pc" ng-class="pieceName + ' ' + chessboard.currentPlayer + ' ' + chessboard.pieceStyle"></div>
+          </div>
+        </div>
+      </div>
       <br/><br/>
       <button id="switch-piece-styles" ng-click="chessboard.switchPieceStyles()">Switch to piece letter abbreviations</button>
     </div>

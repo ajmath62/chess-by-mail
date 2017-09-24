@@ -40,6 +40,13 @@ function findPiece(boardState, pieceType) {
     return squareList;
 }
 
+function getOtherColor(color) {
+    if (color === "white")
+        return "black";
+    if (color === "black")
+        return "white";
+}
+
 function isPieceMovable(boardState, startSquare, endSquare) {
     pieceType = boardState[startSquare];
     pieceColor = pieceType.split(" ")[0];
@@ -48,7 +55,6 @@ function isPieceMovable(boardState, startSquare, endSquare) {
     switch (pieceType) {
     case "white pawn":
         switch (moveDistance.join(",")) {
-        // AJK TODO need to include promotion
         case "0,1":
             return !Boolean(boardState[endSquare]);
         case "0,2":
@@ -56,13 +62,11 @@ function isPieceMovable(boardState, startSquare, endSquare) {
         case "1,1":
         case "-1,1":
             return contains(boardState[endSquare], "black");
-        // AJK TODO need to include en passant
         default:
             return false;
         }
     case "black pawn":
         switch (moveDistance.join(",")) {
-        // AJK TODO need to include promotion (requires UI change)
         case "0,-1":
             return !Boolean(boardState[endSquare]);
         case "0,-2":
@@ -161,7 +165,6 @@ function isPieceMovable(boardState, startSquare, endSquare) {
         return !contains(boardState[endSquare], pieceColor);
     case "white king":
     case "black king":
-        // AJK TODO look out for check (here and all places: a player can't be in check at the end of their move)
         switch (moveDistance.join(",")) {
         case "0,1":
         case "1,1":
@@ -183,13 +186,10 @@ function isPieceMovable(boardState, startSquare, endSquare) {
 
 function checkCheck(boardState, color) {
     [kingLoc] = findPiece(boardState, color + " king");
-    if (color === "white")
-        otherColor = "black ";
-    else if (color === "black")
-        otherColor = "white ";
+    otherColor = getOtherColor(color)
 
     for (let pieceName of pieceNameList) {
-        pieceType = otherColor + pieceName;
+        pieceType = otherColor + " " + pieceName;
         for (let pieceLoc of findPiece(boardState, pieceType)) {
             // If any piece is attacking the king, return its location
             if (isPieceMovable(boardState, pieceLoc, kingLoc))
@@ -201,18 +201,22 @@ function checkCheck(boardState, color) {
     return "";
 }
 
-function checkMoveValidity(boardState, startSquare, endSquare) {
+function checkMoveValidity(boardState, startSquare, endSquare, currentPlayer) {
+    if (boardState[startSquare].split(" ")[0] !== currentPlayer)
+        // A player can only move their own pieces
+        // AJK TODO display an indicator of whose turn it is
+        return [false, ["turn", null]];
+
     if (!isPieceMovable(boardState, startSquare, endSquare))
         // Make sure a piece can actually make the move specified
         return [false, ["illegal", null]];
 
-    playerColor = boardState[startSquare].split(" ")[0];
     // Test out the move before actually making it to see if any issues arise
     boardCopy = {};
     for (let [square, pieceType] of Object.entries(boardState))
         boardCopy[square] = pieceType;
     makeMove(boardCopy, startSquare, endSquare);
-    checkingSquare = checkCheck(boardCopy, playerColor);
+    checkingSquare = checkCheck(boardCopy, currentPlayer);
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", checkingSquare]];
@@ -226,4 +230,13 @@ function makeMove(boardState, startSquare, endSquare) {
     pieceType = boardState[startSquare];
     delete boardState[startSquare];
     boardState[endSquare] = pieceType;
+}
+
+function checkPromotion(boardState, square) {
+    // Return true if the piece is a pawn on its last rank and false otherwise
+    [pieceColor, pieceName] = boardState[square].split(" ");
+    if (((pieceColor === "white" && square[1] == 8) || (pieceColor === "black" && square[1] == 1)) && pieceName === "pawn")
+        return true;
+    else
+        return false;
 }
