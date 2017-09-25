@@ -20,7 +20,9 @@
     <div id="game-controller" ng-controller="GameController">
       <h2>Game description string</h2>
       <input type="text" ng-model="hash" size="60"/>
-      <button type="submit" ng-click="openGame()">Open game</button>
+      <br/><br/>
+      <button type="submit" ng-click="getGameString()">Get game string</button>
+      <button type="submit" ng-click="loadGame()">Load game from string</button>
     </div>
     <div id="chessboard-controller" ng-controller="ChessboardController">
       <h2>{{ currentPlayer === "white" ? "White" : "Black" }} to play</h2>

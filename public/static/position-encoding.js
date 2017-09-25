@@ -1,7 +1,6 @@
 gameNameList = ["chess"];
 // AJK TODO move these to a constants.js file
 pieceNameCounter = [["pawn", 8], ["rook", 2], ["knight", 2], ["bishop", 2], ["queen", 1], ["king", 1]];
-promotablePieceList = ["knight", "bishop", "rook", "queen"]
 pieceStyleList = ["letter", "symbol"];
 colorList = ["white", "black"];
 $(document).ready(function(){
@@ -21,16 +20,8 @@ function squareToBits(square) {
     return columnBits + rowBits;
 }
 
-function pieceTypeToBits(pieceType) {
-    [pieceColor, pieceName] = pieceType.split(" ");
-    var colorBits = integerToBits(colorList.indexOf(pieceColor), 1);
-    var nameBits = integerToBits(promotablePieceList.indexOf(pieceName), 2);
-    return colorBits + nameBits;
-}
-
-function pieceListToBits(pieceList){
+function pieceListToBits(pieceList) {
     // AJK TODO optimize this, e.g. commonly occupied spaces take fewer bits to record (like UTF-8/Morse code)
-    // AJK TODO if this is slow, speed it up, but I don't think it will be
     var pieceToSquareMapping = {};
     for (let [square, pieceType] of Object.entries(pieceList)) {
         if (pieceToSquareMapping[pieceType])
@@ -55,7 +46,7 @@ function pieceListToBits(pieceList){
             while (pieceTypeSquareList.length) {
                 // There is a promoted piece of type pieceType
                 var pieceSquare = pieceTypeSquareList.pop();
-                pieceBits.push("11" + pieceTypeToBits(pieceType) + squareToBits(pieceSquare));
+                pieceBits.push("11" + squareToBits(pieceSquare));
             }
         }
     }
@@ -71,24 +62,97 @@ function gameToString() {
     var castleLegality = [chessScope.castleLegality.white.A, chessScope.castleLegality.white.H,
                           chessScope.castleLegality.black.A, chessScope.castleLegality.black.H];
 
-    gameNameBits = gameName.toString(2).substr(0, 4).padStart(4, "0");  // length 4
-    pieceBits = pieceListToBits(pieceList);  // length around 100-200
-    pieceStyleBits = pieceStyle.toString(2).substr(0, 4).padStart(4, "0");  // length 4
+    var gameNameBits = integerToBits(gameName, 4);  // length 4
+    var pieceBits = pieceListToBits(pieceList);  // length around 100-200
+    var pieceStyleBits = integerToBits(pieceStyle, 4);  // length 4
     // AJK TODO optimize this, e.g. nearby spaces take fewer bits to record
-    lastMoveBits = lastMove.map(squareToBits).join("");  // length 12
-    currentPlayerBits = currentPlayer.toString(2).substr(0, 1).padStart(1, "0");  // length 1
-    castleLegalityBits = castleLegality.map(function(bool){return bool ? 1 : 0}).join("");  // length 4
+    var lastMoveBits = lastMove.map(squareToBits).join("");  // length 12
+    var currentPlayerBits = currentPlayer.toString(2).substr(0, 1).padStart(1, "0");  // length 1
+    var castleLegalityBits = castleLegality.map(function(bool){return bool ? 1 : 0}).join("");  // length 4
 
     // AJK TODO add a few random bits/scramble things to make it hard to edit
-    finalBitString = gameNameBits + pieceBits + pieceStyleBits + lastMoveBits + currentPlayerBits + castleLegalityBits;
-    finalByteArray = [];
+    var finalBitString = gameNameBits + pieceBits + pieceStyleBits + lastMoveBits + currentPlayerBits + castleLegalityBits;
+    var finalByteArray = [];
     for (var i = 0; i < finalBitString.length; i += 8) {
-        finalByteArray.push(String.fromCharCode(parseInt(finalBitString.substr(i, 8), 2)))
+        finalByteArray.push(String.fromCharCode(parseInt(finalBitString.substr(i, 8).padEnd(8, "0"), 2)))
     }
-    base64String = btoa(finalByteArray.join(""))  // length around 40
+    var base64String = btoa(finalByteArray.join(""))  // length around 40
     return base64String;
 }
 
-function stringToGame(inputString) {
+function bitsToSquare(squareBits) {
+    var column = "ABCDEFGH".charAt(parseInt(squareBits.substr(0, 3), 2));
+    var row = parseInt(squareBits.substr(3, 3), 2) + 1;
+    return column + row;
+}
 
+function bitsToPieceMapping(bitString) {
+    var squareToPieceMapping = {};
+    var currentBit = 0;
+    var pieceType = "";
+    var previousPieceType = "";
+    for (let pieceColor of colorList) {
+        for (let [pieceName, count] of pieceNameCounter) {
+            previousPieceType = pieceType;
+            pieceType = pieceColor + " " + pieceName;
+            for (var i = 0; i < count; i ++) {
+                var firstMarkerBit = bitString.charAt(currentBit++);
+                if (firstMarkerBit === "0") {
+                    // This is a normal piece. The next six bits are the square it is on, and after that is the next piece.
+                    var square = bitsToSquare(bitString.substr(currentBit, 6));
+                    squareToPieceMapping[square] = pieceType;
+                    currentBit += 6;
+                }
+                else {
+                    var secondMarkerBit = bitString.charAt(currentBit++);
+                    if (secondMarkerBit === "0") {
+                        // This is a captured piece. It has no square, so the next piece follows immediately.
+                    }
+                    else {
+                        // This is a promoted piece. The next six bits are the square it is on, and after
+                        // that is the next piece. Note that this piece has the previous piece type, and
+                        // that it doesn't count towards this piece type's count.
+                        var square = bitsToSquare(bitString.substr(currentBit, 6));
+                        squareToPieceMapping[square] = previousPieceType;
+                        currentBit += 6;
+                        i --;
+                    }
+                }
+            }
+        }
+    }
+    return [squareToPieceMapping, currentBit];
+}
+
+function stringToGame(inputString) {
+    var bitString = atob(inputString).split("").map(function(byte){return byte.charCodeAt().toString(2).padStart(8, "0");}).join("")
+
+    var gameName = gameNameList[parseInt(bitString.substr(0, 4), 2)];
+
+    if (gameName === "chess") {
+        [pieces, currentBit] = bitsToPieceMapping(bitString.substr(4));
+        currentBit += 4;
+
+        var pieceStyle = pieceStyleList[parseInt(bitString.substr(currentBit, 4), 2)];
+        currentBit += 4;
+
+        var lastMoveStart = bitsToSquare(bitString.substr(currentBit, 6));
+        var lastMoveEnd = bitsToSquare(bitString.substr(currentBit+6, 6));
+        if (lastMoveStart === lastMoveEnd)
+            var lastMove = ["", ""];
+        else
+            var lastMove = [lastMoveStart, lastMoveEnd];
+        currentBit += 12;
+
+        var currentPlayer = colorList[parseInt(bitString.substr(currentBit, 1), 2)];
+        currentBit += 1;
+
+        // parseInt doesn't work for some reason so I'm using parseFloat
+        var castleLegalityBits = bitString.substr(currentBit, 4).split("").map(parseFloat).map(Boolean);
+        var castleLegality = {"white": {"A": castleLegalityBits[0], "H": castleLegalityBits[1]},
+                              "black": {"A": castleLegalityBits[2], "H": castleLegalityBits[3]}};
+
+        var stuff = [pieceStyle, lastMove, castleLegality];
+        return stuff;
+    }
 }

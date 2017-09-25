@@ -1,6 +1,6 @@
 pieceNameList = ["pawn", "rook", "knight", "bishop", "queen", "king"];
 
-function contains(array, object){
+function contains(array, object) {
     // Return true if array exists and is indexable and contains object
     return Boolean(array && array.indexOf && array.indexOf(object) !== -1);
 }

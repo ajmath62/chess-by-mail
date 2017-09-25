@@ -5,8 +5,12 @@
         $scope.gameName = "chess";
         $scope.hash = "";
 
-        $scope.openGame = function(){
+        $scope.getGameString = function() {
             $scope.hash = gameToString();
+        }
+
+        $scope.loadGame = function() {
+            console.log(stringToGame($scope.hash));
         }
     }])
 }());
