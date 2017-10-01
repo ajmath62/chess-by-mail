@@ -3,6 +3,7 @@ gameNameList = ["chess"];
 pieceNameCounter = [["pawn", 8], ["rook", 2], ["knight", 2], ["bishop", 2], ["queen", 1], ["king", 1]];
 pieceStyleList = ["letter", "symbol"];
 colorList = ["white", "black"];
+shiftBitLength = 11;
 
 
 function integerToBits(integer, outputLength) {
@@ -63,14 +64,21 @@ function gameToString(gameName, gameState) {
     var pieceStyleBits = integerToBits(pieceStyle, 4);  // length 4
     // AJK TODO optimize this, e.g. nearby spaces take fewer bits to record
     var lastMoveBits = lastMove.map(squareToBits).join("");  // length 12
-    var currentPlayerBits = currentPlayer.toString(2).substr(0, 1).padStart(1, "0");  // length 1
+    var currentPlayerBits = integerToBits(currentPlayer, 1);  // length 1
     var castleLegalityBits = castleLegality.map(function(bool){return bool ? 1 : 0}).join("");  // length 4
 
-    // AJK TODO add a few random bits/scramble things to make it hard to edit
-    var finalBitString = gameNameBits + pieceBits + pieceStyleBits + lastMoveBits + currentPlayerBits + castleLegalityBits;
+    var combinedBitString = gameNameBits + pieceBits + pieceStyleBits + lastMoveBits + currentPlayerBits + castleLegalityBits;
+
+    var shift = Math.floor(Math.random() * combinedBitString.length);
+    var shiftBits = integerToBits(shift, shiftBitLength);  // Assumes combinedBitString.length < 2048
+    var padBits = 8 - (combinedBitString.length + shiftBitLength) % 8;
+    var paddedBitString = combinedBitString + "0".repeat(padBits);
+    var shiftedBitString = paddedBitString.substr(shift) + paddedBitString.substr(0, shift);
+    var finalBitString = shiftBits + shiftedBitString;
+
     var finalByteArray = [];
     for (var i = 0; i < finalBitString.length; i += 8) {
-        finalByteArray.push(String.fromCharCode(parseInt(finalBitString.substr(i, 8).padEnd(8, "0"), 2)))
+        finalByteArray.push(String.fromCharCode(parseInt(finalBitString.substr(i, 8), 2)))
     }
     var base64String = btoa(finalByteArray.join(""))  // length around 40
     return base64String;
@@ -121,14 +129,21 @@ function bitsToPieceMapping(bitString) {
 }
 
 function stringToGame(inputString) {
-    var bitString = atob(inputString).split("").map(function(byte){return byte.charCodeAt().toString(2).padStart(8, "0");}).join("")
+    var rawBitString = atob(inputString).split("").map(function(byte){return byte.charCodeAt().toString(2).padStart(8, "0");}).join("")
+
+    var shiftBits = rawBitString.substr(0, 11);
+    var trimmedRawBitString = rawBitString.substr(11);
+    var shift = parseInt(shiftBits, 2);
+    var reverseShift = trimmedRawBitString.length - shift;
+    var bitString = trimmedRawBitString.substr(reverseShift) + trimmedRawBitString.substr(0, reverseShift);
 
     var gameName = gameNameList[parseInt(bitString.substr(0, 4), 2)];
+    var currentBit = 4;
     var gameState = {};
 
     if (gameName === "chess") {
-        [gameState.pieces, currentBit] = bitsToPieceMapping(bitString.substr(4));
-        currentBit += 4;
+        [gameState.pieces, numberOfBitsUsed] = bitsToPieceMapping(bitString.substr(4));
+        currentBit += numberOfBitsUsed;
 
         gameState.pieceStyle = pieceStyleList[parseInt(bitString.substr(currentBit, 4), 2)];
         currentBit += 4;
