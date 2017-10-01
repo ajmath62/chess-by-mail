@@ -16,16 +16,22 @@
     <link rel="stylesheet" href="css/base.css">
   </head>
   <body>
-    <!--AJK TODO box for inputting/outputting the game hash, instructions saying what it does, hide everything else when input is selected-->
     <div ng-controller="GameController">
-      <div id="meta-controls">
-        <h2>Game description string</h2>
-        <input type="text" ng-model="hash" size="60"/>
+      <h2>Game description string</h2>
+      <div id="meta-controls" ng-if="gameName === null">
+        <!--AJK TODO instructions saying what this does-->
+        <input type="text" ng-model="$parent.inputHash" size="60"/>
+        <br/><br/>
+        <button type="submit" ng-click="loadGame()">Load game from string</button>
+        <button type="submit" ng-click="newGame()">New game</button>
+      </div>
+      <div ng-if="gameName !== null" ng-cloak>
+        <input id="output-hash" type="text" ng-model="$parent.outputHash" size="60" onclick="this.select()"/>
         <br/><br/>
         <button type="submit" ng-click="getGameString()">Get game string</button>
-        <button type="submit" ng-click="loadGame()">Load game from string</button>
+        <button type="submit" ng-click="goToMenu()">Return to menu</button>
       </div>
-      <div ng-controller="ChessboardController">
+      <div ng-controller="ChessboardController" ng-if="gameName === 'chess'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
         <div id="chessboard" class="board">
           <div ng-repeat="row in rows" class="row">
