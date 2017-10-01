@@ -203,14 +203,18 @@ function isPieceMovable(boardState, startSquare, endSquare, lastMove, castleLega
                 return false;
             else {
                 var threatColor = getOtherColor(pieceType.split(" ")[0]);
-                // Check that there are no threats to the king or the square the king is moving through
-                // Don't look at the square the king is moving to, that gets looked at later
-                for (let moveDistance of [[0, 0], [1, 0]]) {
-                    var squareToCheck = getNeighboringSquare(startSquare, moveDistance)
-                    var threatSquare = checkThreat(boardState, squareToCheck, threatColor);
-                    if (threatSquare)
-                        return [false, ["check", [threatSquare, squareToCheck]]];
-                }
+                // Check that there are no threats to the king or the square the king is
+                // moving through. Don't look at the square the king is moving to, that
+                // gets looked at later.
+                threatSquare = checkThreat(boardState, startSquare, threatColor);
+                if (threatSquare)
+                    return [false, ["check", [threatSquare, squareToCheck]]];
+
+                var moveThroughSquare = getNeighboringSquare(startSquare, [1, 0])
+                var boardCopy = makeTestMove(boardState, startSquare, moveThroughSquare);
+                var threatSquare = checkThreat(boardCopy, moveThroughSquare, threatColor);
+                if (threatSquare)
+                    return [false, ["check", [threatSquare, moveThroughSquare]]];
             }
             return [true, "castle-king"];
         case "-2,0":
@@ -223,14 +227,18 @@ function isPieceMovable(boardState, startSquare, endSquare, lastMove, castleLega
                 return false;
             else {
                 var threatColor = getOtherColor(pieceType.split(" ")[0]);
-                // Check that there are no threats to the king or the square the king is moving through
-                // Don't look at the square the king is moving to, that gets looked at later
-                for (let moveDistance of [[0, 0], [-1, 0]]) {
-                    var squareToCheck = getNeighboringSquare(startSquare, moveDistance)
-                    var threatSquare = checkThreat(boardState, squareToCheck, threatColor);
-                    if (threatSquare)
-                        return [false, ["check", [threatSquare, squareToCheck]]];
-                }
+                // Check that there are no threats to the king or the square the king is
+                // moving through. Don't look at the square the king is moving to, that
+                // gets looked at later.
+                threatSquare = checkThreat(boardState, startSquare, threatColor);
+                if (threatSquare)
+                    return [false, ["check", [threatSquare, squareToCheck]]];
+
+                var moveThroughSquare = getNeighboringSquare(startSquare, [-1, 0])
+                var boardCopy = makeTestMove(boardState, startSquare, moveThroughSquare);
+                var threatSquare = checkThreat(boardCopy, moveThroughSquare, threatColor);
+                if (threatSquare)
+                    return [false, ["check", [threatSquare, moveThroughSquare]]];
             }
             return [true, "castle-queen"];
         default:
@@ -242,10 +250,16 @@ function isPieceMovable(boardState, startSquare, endSquare, lastMove, castleLega
 }
 
 function makeTestMove(boardState, startSquare, endSquare) {
+    // Make a copy of the boardState
+    var boardCopy = {};
+    for (let [square, pieceType] of Object.entries(boardState))
+        boardCopy[square] = pieceType;
+
     // Move the piece, capturing if necessary
-    var pieceType = boardState[startSquare];
-    delete boardState[startSquare];
-    boardState[endSquare] = pieceType;
+    var pieceType = boardCopy[startSquare];
+    delete boardCopy[startSquare];
+    boardCopy[endSquare] = pieceType;
+    return boardCopy;
 }
 
 function checkThreat(boardState, square, color) {
@@ -291,10 +305,7 @@ function checkMoveValidity(gameState, startSquare, endSquare) {
         return [false, moveLegality[1]];
 
     // Test out the move before actually making it to see if any issues arise
-    var boardCopy = {};
-    for (let [square, pieceType] of Object.entries(gameState.pieces))
-        boardCopy[square] = pieceType;
-    makeTestMove(boardCopy, startSquare, endSquare);
+    boardCopy = makeTestMove(gameState.pieces, startSquare, endSquare);
     var checkingSquare = checkCheck(boardCopy, currentPlayer);
     var kingSquare = findPiece(boardCopy, currentPlayer + " king")
     // AJK TODO alert the user if there is checkmate
