@@ -3,10 +3,6 @@ gameNameList = ["chess"];
 pieceNameCounter = [["pawn", 8], ["rook", 2], ["knight", 2], ["bishop", 2], ["queen", 1], ["king", 1]];
 pieceStyleList = ["letter", "symbol"];
 colorList = ["white", "black"];
-$(document).ready(function(){
-    metaScope = window.angular.element($("#game-controller")).scope();
-    chessScope = window.angular.element($("#chessboard-controller")).scope();
-})
 
 
 function integerToBits(integer, outputLength) {
@@ -53,14 +49,14 @@ function pieceListToBits(pieceList) {
     return pieceBits.join("");
 }
 
-function gameToString() {
-    var gameName = gameNameList.indexOf(metaScope.gameName);  // length 4
-    var pieceList = chessScope.pieces;
-    var pieceStyle = pieceStyleList.indexOf(chessScope.pieceStyle);  // length 4
-    var lastMove = chessScope.lastMove[0] ? chessScope.lastMove : ["A1", "A1"];
-    var currentPlayer = colorList.indexOf(chessScope.currentPlayer);
-    var castleLegality = [chessScope.castleLegality.white.A, chessScope.castleLegality.white.H,
-                          chessScope.castleLegality.black.A, chessScope.castleLegality.black.H];
+function gameToString(gameName, gameState) {
+    var gameName = gameNameList.indexOf(gameName);  // length 4
+    var pieceList = gameState.pieces;
+    var pieceStyle = pieceStyleList.indexOf(gameState.pieceStyle);  // length 4
+    var lastMove = gameState.lastMove[0] ? gameState.lastMove : ["A1", "A1"];
+    var currentPlayer = colorList.indexOf(gameState.currentPlayer);
+    var castleLegality = [gameState.castleLegality.white.A, gameState.castleLegality.white.H,
+                          gameState.castleLegality.black.A, gameState.castleLegality.black.H];
 
     var gameNameBits = integerToBits(gameName, 4);  // length 4
     var pieceBits = pieceListToBits(pieceList);  // length around 100-200

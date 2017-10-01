@@ -17,35 +17,38 @@
   </head>
   <body>
     <!--AJK TODO box for inputting/outputting the game hash, instructions saying what it does, hide everything else when input is selected-->
-    <div id="game-controller" ng-controller="GameController">
-      <h2>Game description string</h2>
-      <input type="text" ng-model="hash" size="60"/>
-      <br/><br/>
-      <button type="submit" ng-click="getGameString()">Get game string</button>
-      <button type="submit" ng-click="loadGame()">Load game from string</button>
-    </div>
-    <div id="chessboard-controller" ng-controller="ChessboardController">
-      <h2>{{ currentPlayer === "white" ? "White" : "Black" }} to play</h2>
-      <div id="chessboard" class="board">
-        <div ng-repeat="row in rows" class="row">
-          <div id="{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
-            <div ng-if="pieces[column + row]" class="pc" ng-class="[pieces[column + row], pieceStyle]"></div>
+    <div ng-controller="GameController">
+      <div id="meta-controls">
+        <h2>Game description string</h2>
+        <input type="text" ng-model="hash" size="60"/>
+        <br/><br/>
+        <button type="submit" ng-click="getGameString()">Get game string</button>
+        <button type="submit" ng-click="loadGame()">Load game from string</button>
+      </div>
+      <div ng-controller="ChessboardController">
+        <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
+        <div id="chessboard" class="board">
+          <div ng-repeat="row in rows" class="row">
+            <div id="{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
+              <div ng-if="gameState.pieces[column + row]" class="pc" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div id="promotion-prompt" ng-if="promotablePawn">
-        <br/>
-        <p>You have promoted! Which piece would you like to promote to?</p>
-        <div class="row">
-          <div ng-repeat="pieceName in ['knight', 'bishop', 'rook', 'queen']" class="square white" ng-click="promote(pieceName)">
-            <div class="pc" ng-class="[currentPlayer, pieceName, pieceStyle]"></div>
+        <!--AJK TODO make this more visible/blocking-->
+        <div id="promotion-prompt" ng-if="gameState.promotablePawn">
+          <br/>
+          <p>You have promoted! Which piece would you like to promote to?</p>
+          <div class="row">
+            <div ng-repeat="pieceName in ['knight', 'bishop', 'rook', 'queen']" class="square white" ng-click="promote(pieceName)">
+              <div class="pc" ng-class="[gameState.currentPlayer, pieceName, gameState.pieceStyle]"></div>
+            </div>
           </div>
         </div>
-      </div>
-      <br/><br/>
-      <div>
-        <label><input type="radio" ng-model="pieceStyle" value="symbol"/>Use piece symbols</label>
-        <label><input type="radio" ng-model="pieceStyle" value="letter"/>Use piece letter abbreviations</label>
+        <br/><br/>
+        <div>
+          <label><input type="radio" ng-model="gameState.pieceStyle" value="symbol"/>Use piece symbols</label>
+          <label><input type="radio" ng-model="gameState.pieceStyle" value="letter"/>Use piece letter abbreviations</label>
+        </div>
       </div>
     </div>
   </body>

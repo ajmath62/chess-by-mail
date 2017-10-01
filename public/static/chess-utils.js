@@ -47,7 +47,7 @@ function getOtherColor(color) {
         return "white";
 }
 
-function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
+function isPieceMovable(boardState, startSquare, endSquare, lastMove, castleLegality) {
     var pieceType = boardState[startSquare];
     var pieceColor = pieceType.split(" ")[0];
     var moveDistance = getSquareDistance(startSquare, endSquare);
@@ -63,8 +63,8 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
         case "-1,1":
             if (contains(boardState[endSquare], "black"))
                 return true;
-            else if (chessScope.lastMove[0] === getNeighboringSquare(endSquare, [0, 1])
-                && chessScope.lastMove[1] === getNeighboringSquare(endSquare, [0, -1])
+            else if (lastMove[0] === getNeighboringSquare(endSquare, [0, 1])
+                && lastMove[1] === getNeighboringSquare(endSquare, [0, -1])
                 && boardState[getNeighboringSquare(endSquare, [0, -1])] === "black pawn")
                 // The last move was a pawn move over the square where this pawn is moving
                 return [true, "enpassant-white"];
@@ -83,8 +83,8 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
         case "-1,-1":
             if (contains(boardState[endSquare], "white"))
                 return true;
-            else if (chessScope.lastMove[0] === getNeighboringSquare(endSquare, [0, -1])
-                && chessScope.lastMove[1] === getNeighboringSquare(endSquare, [0, 1])
+            else if (lastMove[0] === getNeighboringSquare(endSquare, [0, -1])
+                && lastMove[1] === getNeighboringSquare(endSquare, [0, 1])
                 && boardState[getNeighboringSquare(endSquare, [0, 1])] === "white pawn")
                 // The last move was a pawn move over the square where this pawn is moving
                 return [true, "enpassant-black"];
@@ -203,9 +203,9 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
                 return false;
             else {
                 var threatColor = getOtherColor(pieceType.split(" ")[0]);
-                // Check that there are no threats to the king, the rook, or the square the rook is moving to
+                // Check that there are no threats to the king or the square the king is moving through
                 // Don't look at the square the king is moving to, that gets looked at later
-                for (let moveDistance of [[0, 0], [1, 0], [3, 0]]) {
+                for (let moveDistance of [[0, 0], [1, 0]]) {
                     var squareToCheck = getNeighboringSquare(startSquare, moveDistance)
                     var threatSquare = checkThreat(boardState, squareToCheck, threatColor);
                     if (threatSquare)
@@ -223,9 +223,9 @@ function isPieceMovable(boardState, startSquare, endSquare, castleLegality) {
                 return false;
             else {
                 var threatColor = getOtherColor(pieceType.split(" ")[0]);
-                // Check that there are no threats to the king, the rook, or the square the rook is moving to
+                // Check that there are no threats to the king or the square the king is moving through
                 // Don't look at the square the king is moving to, that gets looked at later
-                for (let moveDistance of [[0, 0], [-1, 0], [-4, 0]]) {
+                for (let moveDistance of [[0, 0], [-1, 0]]) {
                     var squareToCheck = getNeighboringSquare(startSquare, moveDistance)
                     var threatSquare = checkThreat(boardState, squareToCheck, threatColor);
                     if (threatSquare)
@@ -252,7 +252,8 @@ function checkThreat(boardState, square, color) {
     // Check if there is a threat to the given square from the given color
 
     // A king can't threaten from two spaces away
-    var castleLegality = {"A": false, "H": false}
+    var lastMove = ["", ""];
+    var castleLegality = {"A": false, "H": false};
 
     for (let pieceName of pieceNameList) {
         var pieceType = color + " " + pieceName;
@@ -273,16 +274,16 @@ function checkCheck(boardState, color) {
     return checkThreat(boardState, kingLoc, otherColor);
 }
 
-function checkMoveValidity(startSquare, endSquare) {
-    var currentPlayer = chessScope.currentPlayer;
-    var castleLegality = chessScope.castleLegality[currentPlayer];
+function checkMoveValidity(gameState, startSquare, endSquare) {
+    var currentPlayer = gameState.currentPlayer;
+    var castleLegality = gameState.castleLegality[currentPlayer];
 
-    if (chessScope.pieces[startSquare].split(" ")[0] !== currentPlayer)
+    if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
         // A player can only move their own pieces
         return [false, ["turn", null]];
 
     // Make sure a piece can actually make the move specified
-    var moveLegality = isPieceMovable(chessScope.pieces, startSquare, endSquare, castleLegality)
+    var moveLegality = isPieceMovable(gameState.pieces, startSquare, endSquare, gameState.lastMove, castleLegality)
     if (!moveLegality)
         return [false, ["illegal", null]];
     else if (moveLegality[0] === false)
@@ -291,7 +292,7 @@ function checkMoveValidity(startSquare, endSquare) {
 
     // Test out the move before actually making it to see if any issues arise
     var boardCopy = {};
-    for (let [square, pieceType] of Object.entries(chessScope.pieces))
+    for (let [square, pieceType] of Object.entries(gameState.pieces))
         boardCopy[square] = pieceType;
     makeTestMove(boardCopy, startSquare, endSquare);
     var checkingSquare = checkCheck(boardCopy, currentPlayer);
@@ -305,35 +306,35 @@ function checkMoveValidity(startSquare, endSquare) {
     // If any rooks were moved or captured, don't allow future castling on that side
     // AJK TODO make this a subroutine, please
     if (startSquare === "A1" || endSquare === "A1")
-        chessScope.castleLegality.white.A = false;
+        gameState.castleLegality.white.A = false;
     if (startSquare === "H1" || endSquare === "H1")
-        chessScope.castleLegality.white.H = false;
+        gameState.castleLegality.white.H = false;
     if (startSquare === "A8" || endSquare === "A8")
-        chessScope.castleLegality.black.A = false;
+        gameState.castleLegality.black.A = false;
     if (startSquare === "H8" || endSquare === "H8")
-        chessScope.castleLegality.black.H = false;
-    if (chessScope.pieces[startSquare] === "white king") {
-        chessScope.castleLegality.white.A = false;
-        chessScope.castleLegality.white.H = false;
+        gameState.castleLegality.black.H = false;
+    if (gameState.pieces[startSquare] === "white king") {
+        gameState.castleLegality.white.A = false;
+        gameState.castleLegality.white.H = false;
     }
-    if (chessScope.pieces[startSquare] === "black king") {
-        chessScope.castleLegality.black.A = false;
-        chessScope.castleLegality.black.H = false;
+    if (gameState.pieces[startSquare] === "black king") {
+        gameState.castleLegality.black.A = false;
+        gameState.castleLegality.black.H = false;
     }
     // Allow the move to be made and pass along any comments from isPieceMovable
     return [true, moveLegality[1]];
 }
 
-function makeMove(startSquare, endSquare) {
+function makeMove(boardState, startSquare, endSquare) {
     // Move the piece, capturing if necessary
-    var pieceType = chessScope.pieces[startSquare];
-    delete chessScope.pieces[startSquare];
-    chessScope.pieces[endSquare] = pieceType;
+    var pieceType = boardState[startSquare];
+    delete boardState[startSquare];
+    boardState[endSquare] = pieceType;
 }
 
-function checkPromotion() {
-    var boardState = chessScope.pieces;
-    var square = chessScope.lastMove[1];
+function checkPromotion(gameState) {
+    var boardState = gameState.pieces;
+    var square = gameState.lastMove[1];
     // Return true if the piece is a pawn on its last rank and false otherwise
     [pieceColor, pieceName] = boardState[square].split(" ");
     if (((pieceColor === "white" && square[1] == 8) || (pieceColor === "black" && square[1] == 1)) && pieceName === "pawn")
