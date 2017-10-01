@@ -124,31 +124,31 @@ function stringToGame(inputString) {
     var bitString = atob(inputString).split("").map(function(byte){return byte.charCodeAt().toString(2).padStart(8, "0");}).join("")
 
     var gameName = gameNameList[parseInt(bitString.substr(0, 4), 2)];
+    var gameState = {};
 
     if (gameName === "chess") {
-        [pieces, currentBit] = bitsToPieceMapping(bitString.substr(4));
+        [gameState.pieces, currentBit] = bitsToPieceMapping(bitString.substr(4));
         currentBit += 4;
 
-        var pieceStyle = pieceStyleList[parseInt(bitString.substr(currentBit, 4), 2)];
+        gameState.pieceStyle = pieceStyleList[parseInt(bitString.substr(currentBit, 4), 2)];
         currentBit += 4;
 
         var lastMoveStart = bitsToSquare(bitString.substr(currentBit, 6));
         var lastMoveEnd = bitsToSquare(bitString.substr(currentBit+6, 6));
         if (lastMoveStart === lastMoveEnd)
-            var lastMove = ["", ""];
+            gameState.lastMove = ["", ""];
         else
-            var lastMove = [lastMoveStart, lastMoveEnd];
+            gameState.lastMove = [lastMoveStart, lastMoveEnd];
         currentBit += 12;
 
-        var currentPlayer = colorList[parseInt(bitString.substr(currentBit, 1), 2)];
+        gameState.currentPlayer = colorList[parseInt(bitString.substr(currentBit, 1), 2)];
         currentBit += 1;
 
         // parseInt doesn't work for some reason so I'm using parseFloat
         var castleLegalityBits = bitString.substr(currentBit, 4).split("").map(parseFloat).map(Boolean);
-        var castleLegality = {"white": {"A": castleLegalityBits[0], "H": castleLegalityBits[1]},
+        gameState.castleLegality = {"white": {"A": castleLegalityBits[0], "H": castleLegalityBits[1]},
                               "black": {"A": castleLegalityBits[2], "H": castleLegalityBits[3]}};
 
-        var stuff = [pieceStyle, lastMove, castleLegality];
-        return stuff;
+        return [gameName, gameState];
     }
 }

@@ -11,7 +11,7 @@
         }
 
         $scope.loadGame = function() {
-            console.log(stringToGame($scope.hash));
+            [$scope.gameName, $scope.gameState] = stringToGame($scope.hash);
         }
     }])
 }());

@@ -1,3 +1,4 @@
+/* AJK TODO there's a small issue with occupied squares having an extra pixel*/
 .board {
   border: 2px solid black;
   height: 640px;
