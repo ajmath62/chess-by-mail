@@ -47,10 +47,10 @@
                     [errorType, errorDetails] = comments;
                     if (errorType === "check") {
                         [fromSquare, toSquare] = errorDetails;
-                        $("#" + fromSquare).addClass("warning");
-                        setTimeout(function(){$("#" + toSquare).addClass("warning");}, 400)
-                        setTimeout(function(){$("#" + fromSquare).removeClass("warning");}, 400)
-                        setTimeout(function(){$("#" + toSquare).removeClass("warning");}, 800)
+                        $("#ch-" + fromSquare).addClass("warning");
+                        setTimeout(function(){$("#ch-" + toSquare).addClass("warning");}, 400)
+                        setTimeout(function(){$("#ch-" + fromSquare).removeClass("warning");}, 400)
+                        setTimeout(function(){$("#ch-" + toSquare).removeClass("warning");}, 800)
                     }
                 }
                 // Whether the move is valid or not, deselect the piece.

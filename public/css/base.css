@@ -1,13 +1,28 @@
 /* AJK TODO there's a small issue with occupied squares having an extra pixel*/
 .board {
   border: 2px solid black;
-  height: 640px;
-  width: 640px;
 }
 
 .row {
   height: 80px;
+}
+
+.board-8 {
+  height: 640px;
   width: 640px;
+}
+
+.board-9 {
+  height: 720px;
+  width: 720px;
+}
+
+.row-8 {
+  width: 640px;
+}
+
+.row-9 {
+  width: 720px;
 }
 
 .square {

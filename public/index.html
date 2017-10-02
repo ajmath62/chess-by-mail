@@ -9,9 +9,11 @@
     <!--Scripts-->
     <script src="static/position-encoding.js"></script>
     <script src="static/chess-utils.js"></script>
+    <script src="static/shogi-utils.js"></script>
     <!--Angular-->
     <script src="static/controllers/game-controller.js"></script>
     <script src="static/controllers/chessboard-controller.js"></script>
+    <script src="static/controllers/shogiboard-controller.js"></script>
     <!--Stylesheets-->
     <link rel="stylesheet" href="css/base.css">
   </head>
@@ -23,7 +25,8 @@
         <input type="text" ng-model="$parent.inputHash" size="60"/>
         <br/><br/>
         <button type="submit" ng-click="loadGame()">Load game from string</button>
-        <button type="submit" ng-click="newGame()">New game</button>
+        <button type="submit" ng-click="newGame('chess')">New chess game</button>
+        <button type="submit" ng-click="newGame('shogi')">New shogi game</button>
       </div>
       <div ng-if="gameName !== null" ng-cloak>
         <input id="output-hash" type="text" ng-model="$parent.outputHash" size="60" onclick="this.select()"/>
@@ -33,9 +36,9 @@
       </div>
       <div ng-controller="ChessboardController" ng-if="gameName === 'chess'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
-        <div id="chessboard" class="board">
-          <div ng-repeat="row in rows" class="row">
-            <div id="{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
+        <div id="chessboard" class="board board-8">
+          <div ng-repeat="row in rows" class="row row-8">
+            <div id="ch-{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
               <div ng-if="gameState.pieces[column + row]" class="pc" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>
           </div>
@@ -54,6 +57,17 @@
         <div>
           <label><input type="radio" ng-model="gameState.pieceStyle" value="symbol"/>Use piece symbols</label>
           <label><input type="radio" ng-model="gameState.pieceStyle" value="letter"/>Use piece letter abbreviations</label>
+        </div>
+      </div>
+      <div ng-controller="ShogiController" ng-if="gameName === 'shogi'" ng-cloak>
+        <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
+        <div id="shogiboard" class="board board-9">
+          <div ng-repeat="row in rows" class="row row-9">
+            <!--AJK TODO add dots to mark promotion zones-->
+            <div id="sh-{{ column + row }}" ng-repeat="column in columns" class="square white" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
+              <div ng-if="gameState.pieces[column + row]" class="pc" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
