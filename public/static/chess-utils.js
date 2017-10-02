@@ -1,5 +1,3 @@
-pieceNameList = ["pawn", "rook", "knight", "bishop", "queen", "king"];
-
 function contains(array, object) {
     // Return true if array exists and is indexable and contains object
     return Boolean(array && array.indexOf && array.indexOf(object) !== -1);
@@ -269,6 +267,7 @@ function checkThreat(boardState, square, color) {
     var lastMove = ["", ""];
     var castleLegality = {"A": false, "H": false};
 
+    var pieceNameList = ["pawn", "rook", "knight", "bishop", "queen", "king"];
     for (let pieceName of pieceNameList) {
         var pieceType = color + " " + pieceName;
         for (let pieceLoc of findPiece(boardState, pieceType)) {

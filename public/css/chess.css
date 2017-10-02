@@ -1,0 +1,55 @@
+.pc.chess.white {
+  color: white;
+}
+
+.pc.chess.black {
+  color: black;
+}
+
+.pc.chess.pawn.letter:before {
+  content: "P";
+}
+
+.pc.chess.rook.letter:before {
+  content: "R";
+}
+
+.pc.chess.knight.letter:before {
+  content: "N";
+}
+
+.pc.chess.bishop.letter:before {
+  content: "B";
+}
+
+.pc.chess.queen.letter:before {
+  content: "Q";
+}
+
+.pc.chess.king.letter:before {
+  content: "K";
+}
+
+.pc.chess.pawn.symbol:before {
+  content: "\265F";
+}
+
+.pc.chess.rook.symbol:before {
+  content: "\265C";
+}
+
+.pc.chess.knight.symbol:before {
+  content: "\265E";
+}
+
+.pc.chess.bishop.symbol:before {
+  content: "\265D";
+}
+
+.pc.chess.queen.symbol:before {
+  content: "\265B";
+}
+
+.pc.chess.king.symbol:before {
+  content: "\265A";
+}
