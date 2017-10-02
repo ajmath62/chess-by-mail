@@ -57,64 +57,65 @@
   height: 54px;
   width: 78px;
   padding-top: 8px;
-  padding-bottom: 89px;
+  padding-bottom: 87px;
   text-align: center;
   vertical-align: middle;
   display: inline-block;
 }
 
-.pc.white {
+/* AJK TODO starting from here, move to chess.css */
+.pc.chess.white {
   color: white;
 }
 
-.pc.black {
+.pc.chess.black {
   color: black;
 }
 
-.pc.pawn.letter:before {
+.pc.chess.pawn.letter:before {
   content: "P";
 }
 
-.pc.rook.letter:before {
+.pc.chess.rook.letter:before {
   content: "R";
 }
 
-.pc.knight.letter:before {
+.pc.chess.knight.letter:before {
   content: "N";
 }
 
-.pc.bishop.letter:before {
+.pc.chess.bishop.letter:before {
   content: "B";
 }
 
-.pc.queen.letter:before {
+.pc.chess.queen.letter:before {
   content: "Q";
 }
 
-.pc.king.letter:before {
+.pc.chess.king.letter:before {
   content: "K";
 }
 
-.pc.pawn.symbol:before {
+.pc.chess.pawn.symbol:before {
   content: "\265F";
 }
 
-.pc.rook.symbol:before {
+.pc.chess.rook.symbol:before {
   content: "\265C";
 }
 
-.pc.knight.symbol:before {
+.pc.chess.knight.symbol:before {
   content: "\265E";
 }
 
-.pc.bishop.symbol:before {
+.pc.chess.bishop.symbol:before {
   content: "\265D";
 }
 
-.pc.queen.symbol:before {
+.pc.chess.queen.symbol:before {
   content: "\265B";
 }
 
-.pc.king.symbol:before {
+.pc.chess.king.symbol:before {
   content: "\265A";
 }
