@@ -1,5 +1,7 @@
 shogi = {};
 
+shogi.promotionForcedRanks = {"white": {"pawn": "I", "lance": "I", "knight": "HI"}, "black": {"pawn": "A", "lance": "A", "knight": "AB"}};
+
 shogi.getNeighboringSquare = function(startSquare, directions) {
     var oldColumn, oldRow, newColumn, newRow;
     [oldColumn, oldRow] = startSquare;
@@ -266,8 +268,28 @@ shogi.newGame = function(gameState) {
     gameState.currentPlayer = "black";
 };
 
-shogi.moveValidity = function(gameState, startSquare, endSquare) {
+shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
     var currentPlayer = gameState.currentPlayer;
+    var isDrop = startSquare.startsWith("*");
+    var dropIndex, pieceColor, pieceName;
+
+    if (endSquare.startsWith("*"))
+        // Can't move a piece to a player's hand
+        return [false, ["illegal", null]];
+
+    if (isDrop) {
+        [pieceColor, dropIndex] = startSquare.substr(1).split(" ");
+        if (pieceColor !== currentPlayer)
+            // A player can only move their own pieces
+            return [false, ["turn", null]];
+        pieceName = inHand[dropIndex];
+        if (gameState.pieces[endSquare])
+            return [false, ["illegal", null]];
+        if (contains(shogi.promotionForcedRanks[pieceColor][pieceName], endSquare[1])) return [false, ["illegal", null]];
+        // AJK TODO don't permit dropping a pawn into checkmate
+        // AJK TODO don't permit dropping a pawn on a file with a pawn in it already
+        return [true, "drop"];
+    }
 
     if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
         // A player can only move their own pieces
@@ -285,26 +307,46 @@ shogi.moveValidity = function(gameState, startSquare, endSquare) {
     var boardCopy = shogi.makeTestMove(gameState.pieces, startSquare, endSquare);
     var checkingSquare = shogi.checkCheck(boardCopy, currentPlayer);
     var kingSquare = findPiece(boardCopy, currentPlayer + " king");
-    // AJK TODO alert the user if there is checkmate
+    // AJK TODO alert the player if there is checkmate
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];
 
-    // Allow the move to be made and pass along any comments from isPieceMovable
-    return [true, moveLegality[1]];
+    // Allow the move to be made
+    return [true, null];
 };
 
-shogi.makeMove = function(boardState, startSquare, endSquare) {
-    // Move the piece, capturing if necessary
-    var pieceType = boardState[startSquare];
-    delete boardState[startSquare];
-    boardState[endSquare] = pieceType;
+shogi.makeMove = function(boardState, startSquare, endSquare, inHand) {
+    var isDrop = startSquare.startsWith("*");
+    var dropIndex, pieceColor, pieceName, pieceType;
+
+    if (isDrop) {
+        [pieceColor, dropIndex] = startSquare.substr(1).split(" ");
+        pieceName = inHand[dropIndex];
+        pieceType = pieceColor + " " + pieceName;
+        boardState[endSquare] = pieceType;
+        inHand.splice(dropIndex, 1);
+    }
+    else {
+        // Move the piece, capturing if necessary
+        pieceType = boardState[startSquare];
+        if (boardState[endSquare]) {
+            var pieceList = ["pawn", "lance", "knight", "silver", "gold", "bishop", "rook", "king"];
+            // Add the name of the newly captured piece, stripped of its color and promotion status, to the list of pieces in hand
+            inHand.push(boardState[endSquare].split(" ")[1].replace("_", ""));
+            // Sort the list of pieces in hand from pawn to king
+            inHand.sort(function (a, b) {
+                return pieceList.indexOf(b) - pieceList.indexOf(a);
+            });
+        }
+        delete boardState[startSquare];
+        boardState[endSquare] = pieceType;
+    }
 };
 
 shogi.checkPromotion = function(gameState) {
     var promotionRanks = {"white": "GHI", "black": "ABC"};
     var promotablePieces = ["pawn", "lance", "knight", "silver", "bishop", "rook"];
-    var promotionForcedRanks = {"white": {"pawn": "I", "lance": "I", "knight": "HI"}, "black": {"pawn": "A", "lance": "A", "knight": "AB"}};
 
     var boardState = gameState.pieces;
     var square = gameState.lastMove[1];
@@ -315,7 +357,7 @@ shogi.checkPromotion = function(gameState) {
         return "forbidden";
     else if (!contains(promotionRanks[pieceColor], square[1]))
         return "forbidden";
-    else if (contains(promotionForcedRanks[pieceColor][pieceName], square[1]))
+    else if (contains(shogi.promotionForcedRanks[pieceColor][pieceName], square[1]))
         return "forced";
     else return "permitted";
 };

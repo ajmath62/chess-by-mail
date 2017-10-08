@@ -6,35 +6,48 @@
         $scope.columns = [9, 8, 7, 6, 5, 4, 3, 2, 1];
 
         $scope.firstClick = null;
-        $scope.clickSquare = function(squareName) {
+        $scope.clickSquare = function($event) {
+            var squareName = $event.currentTarget.id;
+            var isDrop = squareName.startsWith("*");
+
             if ($scope.firstClick === null) {
                 // If there is a piece on the chosen square, mark the square as selected
-                if ($scope.gameState.pieces[squareName]) {
+                if ($scope.gameState.pieces[squareName] || isDrop) {
                     $scope.firstClick = squareName;
                 }
             }
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
+                var playerHand = $scope.gameState.inHand[$scope.gameState.currentPlayer];
                 var comments, moveValidity;
-                [moveValidity, comments] = shogi.moveValidity($scope.gameState, $scope.firstClick, squareName);
+                [moveValidity, comments] = shogi.moveValidity($scope.gameState, $scope.firstClick, squareName, playerHand);
+
                 if (moveValidity) {
-                    shogi.makeMove($scope.gameState.pieces, $scope.firstClick, squareName);
-                    $scope.gameState.lastMove = [$scope.firstClick, squareName];
+                    shogi.makeMove($scope.gameState.pieces, $scope.firstClick, squareName, playerHand);
                     $scope.upToDateString.value = false;
 
-                    switch (shogi.checkPromotion($scope.gameState)) {
-                    case "forbidden":
+                    if (comments === "drop") {
+                        $scope.gameState.lastMove = ["", squareName];
+                        // AJK TODO write a method that just does this one thing
                         $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
-                        break;
-                    case "permitted":
-                        $scope.gameState.promotable = squareName;
-                        break;
-                    case "forced":
-                        $scope.gameState.pieces[squareName] += "_";
-                        $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
-                        break;
-                    default:
-                        break;
+                    }
+                    else {
+                        $scope.gameState.lastMove = [$scope.firstClick, squareName];
+
+                        switch (shogi.checkPromotion($scope.gameState)) {
+                            case "forbidden":
+                                $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+                                break;
+                            case "permitted":
+                                $scope.gameState.promotable = squareName;
+                                break;
+                            case "forced":
+                                $scope.gameState.pieces[squareName] += "_";
+                                $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 else {
@@ -42,10 +55,10 @@
                     [errorType, errorDetails] = comments;
                     if (errorType === "check") {
                         [fromSquare, toSquare] = errorDetails;
-                        $("#sh-" + fromSquare).addClass("warning");
-                        setTimeout(function(){$("#sh-" + toSquare).addClass("warning");}, 400);
-                        setTimeout(function(){$("#sh-" + fromSquare).removeClass("warning");}, 400);
-                        setTimeout(function(){$("#sh-" + toSquare).removeClass("warning");}, 800);
+                        $("#" + fromSquare).addClass("warning");
+                        setTimeout(function(){$("#" + toSquare).addClass("warning");}, 400);
+                        setTimeout(function(){$("#" + fromSquare).removeClass("warning");}, 400);
+                        setTimeout(function(){$("#" + toSquare).removeClass("warning");}, 800);
                     }
                 }
                 // Whether the move is valid or not, deselect the piece.

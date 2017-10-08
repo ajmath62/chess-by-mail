@@ -65,15 +65,17 @@
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
         <div id="white-hand" ng-if="gameState.inHand.white.length" class="shogi-hand">
           <div class="shogi-marker white"></div>
-          <div class="hand-holder" ng-repeat="piece in gameState.inHand.white track by $index">
-            <div id="*white {{ $index }}" class="pc shogi black" ng-class="[piece, gameState.pieceStyle]"></div>
+          <div id="*white {{ $index }}" ng-repeat="piece in gameState.inHand.white track by $index" class="square mini" ng-class="{'selected': firstClick === '*white ' + $index}" ng-click="clickSquare($event)">
+            <!--div.black so that the piece is right side up-->
+            <div class="pc shogi black" ng-class="[piece, gameState.pieceStyle]"></div>
           </div>
         </div>
         <br/>
         <div id="shogi-board" class="board board-9">
           <div ng-repeat="row in rows" class="row row-9">
             <!--AJK TODO add dots to mark promotion zones-->
-            <div id="sh-{{ column + row }}" ng-repeat="column in columns" class="square white" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
+            <!--AJK TODO make a directive for the ng-classes here and elsewhere (selected, last-move etc.)-->
+            <div id="{{ column + row }}" ng-repeat="column in columns" class="square white" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare($event)">
               <div ng-if="gameState.pieces[column + row]" class="pc shogi" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>
           </div>
@@ -81,8 +83,8 @@
         <br/>
         <div id="black-hand" ng-if="gameState.inHand.black.length" class="shogi-hand">
           <div class="shogi-marker black"></div>
-          <div class="hand-holder" ng-repeat="piece in gameState.inHand.black track by $index">
-            <div id="*black {{ $index }}" class="pc shogi black" ng-class="[piece, gameState.pieceStyle]"></div>
+          <div id="*black {{ $index }}" ng-repeat="piece in gameState.inHand.black track by $index" class="square mini" ng-class="{'selected': firstClick === '*black ' + $index}" ng-click="clickSquare($event)">
+            <div class="pc shogi black" ng-class="[piece, gameState.pieceStyle]"></div>
           </div>
         </div>
         <div id="shogi-promotion-prompt" ng-if="gameState.promotable">
