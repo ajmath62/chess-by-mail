@@ -30,7 +30,6 @@
                         $scope.gameState.promotable = squareName;
                         break;
                     case "forced":
-                        console.log($scope.gameState.pieces[squareName]);
                         $scope.gameState.pieces[squareName] += "_";
                         $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
                         break;
@@ -43,10 +42,10 @@
                     [errorType, errorDetails] = comments;
                     if (errorType === "check") {
                         [fromSquare, toSquare] = errorDetails;
-                        $("#ch-" + fromSquare).addClass("warning");
-                        setTimeout(function(){$("#ch-" + toSquare).addClass("warning");}, 400);
-                        setTimeout(function(){$("#ch-" + fromSquare).removeClass("warning");}, 400);
-                        setTimeout(function(){$("#ch-" + toSquare).removeClass("warning");}, 800);
+                        $("#sh-" + fromSquare).addClass("warning");
+                        setTimeout(function(){$("#sh-" + toSquare).addClass("warning");}, 400);
+                        setTimeout(function(){$("#sh-" + fromSquare).removeClass("warning");}, 400);
+                        setTimeout(function(){$("#sh-" + toSquare).removeClass("warning");}, 800);
                     }
                 }
                 // Whether the move is valid or not, deselect the piece.

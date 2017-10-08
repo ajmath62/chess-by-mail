@@ -48,8 +48,8 @@
                     [errorType, errorDetails] = comments;
                     if (errorType === "check") {
                         [fromSquare, toSquare] = errorDetails;
+                        // Flash the two squares involved to alert the player why their move is illegal
                         $("#ch-" + fromSquare).addClass("warning");
-                        // AJK TODO make this more abstracted, use the directive
                         setTimeout(function(){$("#ch-" + toSquare).addClass("warning");}, 400);
                         setTimeout(function(){$("#ch-" + fromSquare).removeClass("warning");}, 400);
                         setTimeout(function(){$("#ch-" + toSquare).removeClass("warning");}, 800)

@@ -84,10 +84,10 @@ shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
             return false;
         }
     case "white gold":
-    case "white pawn+":
-    case "white lance+":
-    case "white knight+":
-    case "white silver+":
+    case "white pawn_":
+    case "white lance_":
+    case "white knight_":
+    case "white silver_":
         switch (moveDistance.join(",")) {
         case "0,1":
         case "1,1":
@@ -100,10 +100,10 @@ shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
             return false;
         }
     case "black gold":
-    case "black pawn+":
-    case "black lance+":
-    case "black knight+":
-    case "black silver+":
+    case "black pawn_":
+    case "black lance_":
+    case "black knight_":
+    case "black silver_":
         switch (moveDistance.join(",")) {
         case "0,1":
         case "1,0":
@@ -115,6 +115,21 @@ shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
         default:
             return false;
         }
+    case "white bishop_":
+    case "black bishop_":
+        // A promoted bishop can make any move a king can
+        switch (moveDistance.join(",")) {
+        case "0,1":
+        case "1,1":
+        case "1,0":
+        case "1,-1":
+        case "0,-1":
+        case "-1,-1":
+        case "-1,0":
+        case "-1,1":
+            return !contains(boardState[endSquare], pieceColor);
+        }
+        // As well as any move a normal bishop can
     case "white bishop":
     case "black bishop":
         moveLength = Math.abs(moveDistance[0]);
@@ -131,6 +146,21 @@ shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
         }
         // The bishop cannot land on a piece of its own color
         return !contains(boardState[endSquare], pieceColor);
+    case "white rook_":
+    case "black rook_":
+        // A promoted rook can make any move a king can
+        switch (moveDistance.join(",")) {
+        case "0,1":
+        case "1,1":
+        case "1,0":
+        case "1,-1":
+        case "0,-1":
+        case "-1,-1":
+        case "-1,0":
+        case "-1,1":
+            return !contains(boardState[endSquare], pieceColor);
+        }
+        // As well as any move a normal rook can
     case "white rook":
     case "black rook":
         if (moveDistance[0] === 0) {
@@ -156,14 +186,6 @@ shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
         }
         // The rook cannot land on a piece of its own color
         return !contains(boardState[endSquare], pieceColor);
-    case "white bishop+":
-    case "black bishop+":
-        // Like a bishop plus king
-        return false;
-    case "white rook+":
-    case "black rook+":
-        // Like a rook plus king
-        return false;
     case "white king":
     case "black king":
         switch (moveDistance.join(",")) {
@@ -184,16 +206,57 @@ shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
     }
 };
 
+shogi.makeTestMove = function(boardState, startSquare, endSquare) {
+    // Make a copy of the boardState
+    var boardCopy = {};
+    for (var square in boardState) {
+        if (boardState.hasOwnProperty(square)) {
+            pieceType = boardState[square];
+            boardCopy[square] = pieceType;
+        }
+    }
+
+    // Move the piece, capturing if necessary
+    var pieceType = boardCopy[startSquare];
+    delete boardCopy[startSquare];
+    boardCopy[endSquare] = pieceType;
+    return boardCopy;
+};
+
+shogi.checkThreat = function(boardState, square, color) {
+    // Check if there is a threat to the given square from the given color
+    var pieceColor, threatSquare;
+
+    for (threatSquare in boardState) {
+        if (boardState.hasOwnProperty(threatSquare)) {
+            pieceColor = boardState[threatSquare].split(" ")[0];
+            if (pieceColor !== color)
+                continue;
+            if (shogi.isPieceMovable(boardState, threatSquare, square))
+                return threatSquare;
+        }
+    }
+
+    // If there is no threat
+    return "";
+};
+
+shogi.checkCheck = function(boardState, color) {
+    [kingLoc] = findPiece(boardState, color + " king");
+    var otherColor = getOtherColor(color);
+    return shogi.checkThreat(boardState, kingLoc, otherColor);
+};
+
 shogi.newGame = function(gameState) {
     gameState.pieces = {"1A": "white lance", "2A": "white knight", "3A": "white silver",
     "4A": "white gold", "5A": "white king", "6A": "white gold", "7A": "white silver",
     "8A": "white knight", "9A": "white lance", "2B": "white bishop", "8B": "white rook",
-    "1C": "white pawn", "2C": "white pawn", "3C": "white pawn", "4C": "white pawn",
+    "1C": "white pawn", "2C": "white pawn", "3C": "black bishop_", "4C": "white pawn",
     "5C": "white pawn", "6C": "white pawn", "7C": "white pawn", "8C": "white pawn",
     "9C": "white pawn", "1G": "black pawn", "2G": "black pawn", "3G": "black pawn",
     "4G": "black pawn", "5G": "black pawn", "6G": "black pawn", "7G": "black pawn",
     "8G": "black pawn", "9G": "black pawn", "2H": "black rook", "8H": "black bishop",
-    "1I": "black lance", "2I": "black knight", "3I": "black silver", "4I": "black gold",
+    "1I": "black lance", "2I": "black knight", "3I": "black silver", "4I": "black gold",  // AJK TODO temporary
     "5I": "black king", "6I": "black gold", "7I": "black silver", "8I": "black knight",
     "9I": "black lance"};  // Starting position
     gameState.pieceStyle = "kanji";  // options are kanji or romaji
@@ -218,14 +281,13 @@ shogi.moveValidity = function(gameState, startSquare, endSquare) {
         return [false, moveLegality[1]];
 
     // Test out the move before actually making it to see if any issues arise
-    // AJK TODO this needs debugging
-    /*var boardCopy = makeTestMove(gameState.pieces, startSquare, endSquare);
-    var checkingSquare = checkCheck(boardCopy, currentPlayer);
+    var boardCopy = shogi.makeTestMove(gameState.pieces, startSquare, endSquare);
+    var checkingSquare = shogi.checkCheck(boardCopy, currentPlayer);
     var kingSquare = findPiece(boardCopy, currentPlayer + " king");
     // AJK TODO alert the user if there is checkmate
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
-        return [false, ["check", [checkingSquare, kingSquare]]];*/
+        return [false, ["check", [checkingSquare, kingSquare]]];
 
     // Allow the move to be made and pass along any comments from isPieceMovable
     return [true, moveLegality[1]];

@@ -236,21 +236,19 @@ chess.makeTestMove = function(boardState, startSquare, endSquare) {
 
 chess.checkThreat = function(boardState, square, color) {
     // Check if there is a threat to the given square from the given color
+    var pieceColor, threatSquare;
 
     // A king can't threaten from two spaces away
     var lastMove = ["", ""];
     var castleLegality = {"A": false, "H": false};
 
-    var pieceNameList = ["pawn", "rook", "knight", "bishop", "queen", "king"];
-    for (var i = 0; i < pieceNameList.length; i ++) {
-        var pieceName = pieceNameList[i];
-        var pieceType = color + " " + pieceName;
-        var pieceLocList = findPiece(boardState, pieceType);
-        for (var j = 0; j < pieceLocList.length; j ++) {
-            var pieceLoc = pieceLocList[j];
-            // If any piece is threatening the square, return its location
-            if (chess.isPieceMovable(boardState, pieceLoc, square, lastMove, castleLegality))
-                return pieceLoc;
+    for (threatSquare in boardState) {
+        if (boardState.hasOwnProperty(threatSquare)) {
+            pieceColor = boardState[threatSquare].split(" ")[0];
+            if (pieceColor !== color)
+                continue;
+            if (chess.isPieceMovable(boardState, threatSquare, square, lastMove, castleLegality))
+                return threatSquare;
         }
     }
 
