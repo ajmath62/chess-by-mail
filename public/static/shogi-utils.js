@@ -20,7 +20,7 @@ function shogiPieceMovable(boardState, startSquare, endSquare) {
     var pieceType = boardState[startSquare];
     var pieceColor = pieceType.split(" ")[0];
     var moveDistance = getSquareDistance(startSquare, endSquare);
-    var checkDistance, i, moveDirection, moveLength;
+    var i, checkDistance, moveDirection, moveLength;
 
     switch (pieceType) {
     case "white pawn":

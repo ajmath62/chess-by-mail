@@ -1,6 +1,6 @@
 gameNameList = ["chess"];
 // AJK TODO move these to a constants.js file
-pieceNameCounter = [["pawn", 8], ["rook", 2], ["knight", 2], ["bishop", 2], ["queen", 1], ["king", 1]];
+pieceNameCounter = {"pawn": 8, "rook": 2, "knight": 2, "bishop": 2, "queen": 1, "king": 1};
 pieceStyleList = ["letter", "symbol"];
 colorList = ["white", "black"];
 shiftBitLength = 11;
@@ -20,30 +20,37 @@ function squareToBits(square) {
 function pieceListToBits(pieceList) {
     // AJK TODO optimize this, e.g. commonly occupied spaces take fewer bits to record (like UTF-8/Morse code)
     var pieceToSquareMapping = {};
-    for (let [square, pieceType] of Object.entries(pieceList)) {
-        if (pieceToSquareMapping[pieceType])
-            pieceToSquareMapping[pieceType].push(square);
-        else
-            pieceToSquareMapping[pieceType] = [square];
+    var count, pieceColor, pieceSquare, pieceType;
+    for (var square in pieceList) {
+        if (pieceList.hasOwnProperty(square)) {
+            pieceType = pieceList[square];
+            if (pieceToSquareMapping[pieceType])
+                pieceToSquareMapping[pieceType].push(square);
+            else
+                pieceToSquareMapping[pieceType] = [square];
+        }
     }
 
-    // AJK TODO look up how JS for-[let-]of syntax actually works
-    var pieceBits = []
-    for (let pieceColor of colorList) {
-        for (let [pieceName, count] of pieceNameCounter) {
-            var pieceType = pieceColor + " " + pieceName;
-            var pieceTypeSquareList = pieceToSquareMapping[pieceType] || [];
-            for (var i = 0; i < count; i ++) {
-                var pieceSquare = pieceTypeSquareList.pop();
-                if (pieceSquare === undefined)
-                    pieceBits.push("10")
-                else
-                    pieceBits.push("0" + squareToBits(pieceSquare));
-            }
-            while (pieceTypeSquareList.length) {
-                // There is a promoted piece of type pieceType
-                var pieceSquare = pieceTypeSquareList.pop();
-                pieceBits.push("11" + squareToBits(pieceSquare));
+    var pieceBits = [];
+    for (var i = 0; i < colorList.length; i ++) {
+        pieceColor = colorList[i];
+        for (var pieceName in pieceNameCounter) {
+            if (pieceNameCounter.hasOwnProperty(pieceName)) {
+                count = pieceNameCounter[pieceName];
+                pieceType = pieceColor + " " + pieceName;
+                var pieceTypeSquareList = pieceToSquareMapping[pieceType] || [];
+                for (var j = 0; j < count; j++) {
+                    pieceSquare = pieceTypeSquareList.pop();
+                    if (pieceSquare === undefined)
+                        pieceBits.push("10");
+                    else
+                        pieceBits.push("0" + squareToBits(pieceSquare));
+                }
+                while (pieceTypeSquareList.length) {
+                    // There is a promoted piece of type pieceType
+                    pieceSquare = pieceTypeSquareList.pop();
+                    pieceBits.push("11" + squareToBits(pieceSquare));
+                }
             }
         }
     }
@@ -51,7 +58,7 @@ function pieceListToBits(pieceList) {
 }
 
 function gameToString(gameName, gameState) {
-    var gameName = gameNameList.indexOf(gameName);  // length 4
+    var gameNameIndex = gameNameList.indexOf(gameName);  // length 4
     var pieceList = gameState.pieces;
     var pieceStyle = pieceStyleList.indexOf(gameState.pieceStyle);  // length 4
     var lastMove = gameState.lastMove[0] ? gameState.lastMove : ["A1", "A1"];
@@ -59,7 +66,7 @@ function gameToString(gameName, gameState) {
     var castleLegality = [gameState.castleLegality.white.A, gameState.castleLegality.white.H,
                           gameState.castleLegality.black.A, gameState.castleLegality.black.H];
 
-    var gameNameBits = integerToBits(gameName, 4);  // length 4
+    var gameNameBits = integerToBits(gameNameIndex, 4);  // length 4
     var pieceBits = pieceListToBits(pieceList);  // length around 100-200
     var pieceStyleBits = integerToBits(pieceStyle, 4);  // length 4
     // AJK TODO optimize this, e.g. nearby spaces take fewer bits to record
@@ -80,8 +87,7 @@ function gameToString(gameName, gameState) {
     for (var i = 0; i < finalBitString.length; i += 8) {
         finalByteArray.push(String.fromCharCode(parseInt(finalBitString.substr(i, 8), 2)))
     }
-    var base64String = btoa(finalByteArray.join(""))  // length around 40
-    return base64String;
+    return btoa(finalByteArray.join(""));  // length around 40
 }
 
 function bitsToSquare(squareBits) {
@@ -94,32 +100,37 @@ function bitsToPieceMapping(bitString) {
     var squareToPieceMapping = {};
     var currentBit = 0;
     var pieceType = "";
-    var previousPieceType = "";
-    for (let pieceColor of colorList) {
-        for (let [pieceName, count] of pieceNameCounter) {
-            previousPieceType = pieceType;
-            pieceType = pieceColor + " " + pieceName;
-            for (var i = 0; i < count; i ++) {
-                var firstMarkerBit = bitString.charAt(currentBit++);
-                if (firstMarkerBit === "0") {
-                    // This is a normal piece. The next six bits are the square it is on, and after that is the next piece.
-                    var square = bitsToSquare(bitString.substr(currentBit, 6));
-                    squareToPieceMapping[square] = pieceType;
-                    currentBit += 6;
-                }
-                else {
-                    var secondMarkerBit = bitString.charAt(currentBit++);
-                    if (secondMarkerBit === "0") {
-                        // This is a captured piece. It has no square, so the next piece follows immediately.
+    var count, pieceColor, previousPieceType, square;
+
+    for (var i = 0; i < colorList.length; i ++) {
+        pieceColor = colorList[i];
+        for (var pieceName in pieceNameCounter) {
+            if (pieceNameCounter.hasOwnProperty(pieceName)) {
+                count = pieceNameCounter[pieceName];
+                previousPieceType = pieceType;
+                pieceType = pieceColor + " " + pieceName;
+                for (var j = 0; j < count; j++) {
+                    var firstMarkerBit = bitString.charAt(currentBit++);
+                    if (firstMarkerBit === "0") {
+                        // This is a normal piece. The next six bits are the square it is on, and after that is the next piece.
+                        square = bitsToSquare(bitString.substr(currentBit, 6));
+                        squareToPieceMapping[square] = pieceType;
+                        currentBit += 6;
                     }
                     else {
-                        // This is a promoted piece. The next six bits are the square it is on, and after
-                        // that is the next piece. Note that this piece has the previous piece type, and
-                        // that it doesn't count towards this piece type's count.
-                        var square = bitsToSquare(bitString.substr(currentBit, 6));
-                        squareToPieceMapping[square] = previousPieceType;
-                        currentBit += 6;
-                        i --;
+                        var secondMarkerBit = bitString.charAt(currentBit++);
+                        if (secondMarkerBit === "0") {
+                            // This is a captured piece. It has no square, so the next piece follows immediately.
+                        }
+                        else {
+                            // This is a promoted piece. The next six bits are the square it is on, and after
+                            // that is the next piece. Note that this piece has the previous piece type, and
+                            // that it doesn't count towards this piece type's count.
+                            square = bitsToSquare(bitString.substr(currentBit, 6));
+                            squareToPieceMapping[square] = previousPieceType;
+                            currentBit += 6;
+                            i--;
+                        }
                     }
                 }
             }
@@ -129,7 +140,7 @@ function bitsToPieceMapping(bitString) {
 }
 
 function stringToGame(inputString) {
-    var rawBitString = atob(inputString).split("").map(function(byte){return byte.charCodeAt().toString(2).padStart(8, "0");}).join("")
+    var rawBitString = atob(inputString).split("").map(function(byte){return byte.charCodeAt(0).toString(2).padStart(8, "0");}).join("");
 
     var shiftBits = rawBitString.substr(0, 11);
     var trimmedRawBitString = rawBitString.substr(11);

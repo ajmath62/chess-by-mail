@@ -4,8 +4,9 @@ function contains(array, object) {
 }
 
 function getNeighboringSquare(startSquare, directions) {
+    var oldColumn, oldRow;
     [oldColumn, oldRow] = startSquare;
-    var newColumn = String.fromCharCode(oldColumn.charCodeAt() + directions[0]);
+    var newColumn = String.fromCharCode(oldColumn.charCodeAt(0) + directions[0]);
     var newRow = parseInt(oldRow) + directions[1];
     if (!contains("ABCDEFGH", newColumn)) {
         // If the column is not a properly named column
@@ -23,17 +24,20 @@ function getNeighboringSquare(startSquare, directions) {
 function getSquareDistance(startSquare, endSquare) {
     [startColumn, startRow] = startSquare;
     [endColumn, endRow] = endSquare;
-    var numColumns = endColumn.charCodeAt() - startColumn.charCodeAt();
-    var numRows = endRow.charCodeAt() - startRow.charCodeAt();
+    var numColumns = endColumn.charCodeAt(0) - startColumn.charCodeAt(0);
+    var numRows = endRow.charCodeAt(0) - startRow.charCodeAt(0);
     return [numColumns, numRows];
 }
 
 function findPiece(boardState, pieceType) {
     // This returns a list, regardless of whether the piece is unique or not
     var squareList = [];
-    for (let [square, piece] of Object.entries(boardState)) {
-        if (piece === pieceType)
-            squareList.push(square);
+    for (var square in boardState) {
+        if (boardState.hasOwnProperty(square)) {
+            var piece = boardState[square];
+            if (piece === pieceType)
+                squareList.push(square);
+        }
     }
     return squareList;
 }
@@ -49,6 +53,7 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
     var pieceType = boardState[startSquare];
     var pieceColor = pieceType.split(" ")[0];
     var moveDistance = getSquareDistance(startSquare, endSquare);
+    var i, boardCopy, checkDistance, moveDirection, moveLength, moveThroughSquare, threatColor, threatSquare;
 
     switch (pieceType) {
     case "white pawn":
@@ -94,22 +99,22 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
     case "white rook":
     case "black rook":
         if (moveDistance[0] === 0) {
-            var moveDirection = [0, Math.sign(moveDistance[1])]
-            var moveLength = Math.abs(moveDistance[1])
-            if (moveDistance[1] === 0)
+            moveDirection = [0, Math.sign(moveDistance[1])];
+            moveLength = Math.abs(moveDistance[1]);
+            if (moveLength === 0)
                 // The rook can't move to its own space
                 return false;
         }
         else if (moveDistance[1] === 0) {
-            var moveDirection = [Math.sign(moveDistance[0]), 0]
-            var moveLength = Math.abs(moveDistance[0])
+            moveDirection = [Math.sign(moveDistance[0]), 0];
+            moveLength = Math.abs(moveDistance[0])
         }
         else
             // The rook can only move along a rank or a file
             return false;
 
         for (i = 1; i < moveLength; i ++) {
-            var checkDistance = [moveDirection[0]*i, moveDirection[1]*i]
+            checkDistance = [moveDirection[0]*i, moveDirection[1]*i];
             if (boardState[getNeighboringSquare(startSquare, checkDistance)])
                 // The rook cannot move through other pieces
                 return false;
@@ -133,14 +138,14 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
         }
     case "white bishop":
     case "black bishop":
-        var moveLength = Math.abs(moveDistance[0])
+        moveLength = Math.abs(moveDistance[0]);
         if (moveLength === 0 || moveLength !== Math.abs(moveDistance[1]))
             // The bishop can only move along a perfect diagonal
             return false;
 
-        var moveDirection = [Math.sign(moveDistance[0]), Math.sign(moveDistance[1])]
+        moveDirection = [Math.sign(moveDistance[0]), Math.sign(moveDistance[1])];
         for (i = 1; i < moveLength; i ++) {
-            var checkDistance = [moveDirection[0]*i, moveDirection[1]*i]
+            checkDistance = [moveDirection[0]*i, moveDirection[1]*i];
             if (boardState[getNeighboringSquare(startSquare, checkDistance)])
                 // The bishop cannot move through other pieces
                 return false;
@@ -150,26 +155,26 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
     case "white queen":
     case "black queen":
         if (moveDistance[0] === 0) {
-            var moveDirection = [0, Math.sign(moveDistance[1])]
-            var moveLength = Math.abs(moveDistance[1])
+            moveDirection = [0, Math.sign(moveDistance[1])];
+            moveLength = Math.abs(moveDistance[1]);
             if (moveDistance[1] === 0)
                 // The queen can't move to its own space
                 return false;
         }
         else if (moveDistance[1] === 0) {
-            var moveDirection = [Math.sign(moveDistance[0]), 0]
-            var moveLength = Math.abs(moveDistance[0])
+            moveDirection = [Math.sign(moveDistance[0]), 0];
+            moveLength = Math.abs(moveDistance[0]);
         }
         else {
-            var moveLength = Math.abs(moveDistance[0])
+            moveLength = Math.abs(moveDistance[0]);
             if (moveLength === 0 || moveLength !== Math.abs(moveDistance[1]))
                 // The queen can only move along a rank, file or perfect diagonal
                 return false;
         }
 
-        var moveDirection = [Math.sign(moveDistance[0]), Math.sign(moveDistance[1])]
+        moveDirection = [Math.sign(moveDistance[0]), Math.sign(moveDistance[1])];
         for (i = 1; i < moveLength; i ++) {
-            var checkDistance = [moveDirection[0]*i, moveDirection[1]*i]
+            checkDistance = [moveDirection[0]*i, moveDirection[1]*i];
             if (boardState[getNeighboringSquare(startSquare, checkDistance)])
                 // The queen cannot move through other pieces
                 return false;
@@ -187,7 +192,7 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
         case "-1,-1":
         case "-1,0":
         case "-1,1":
-            return !contains(boardState[endSquare], pieceColor)
+            return !contains(boardState[endSquare], pieceColor);
         case "2,0":
             if (!castleLegality.H)
                 return false;
@@ -196,17 +201,17 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
                     || boardState[getNeighboringSquare(startSquare, [2, 0])])
                 return false;
             else {
-                var threatColor = getOtherColor(pieceType.split(" ")[0]);
+                threatColor = getOtherColor(pieceType.split(" ")[0]);
                 // Check that there are no threats to the king or the square the king is
                 // moving through. Don't look at the square the king is moving to, that
                 // gets looked at later.
                 threatSquare = checkThreat(boardState, startSquare, threatColor);
                 if (threatSquare)
-                    return [false, ["check", [threatSquare, squareToCheck]]];
+                    return [false, ["check", [threatSquare, startSquare]]];
 
-                var moveThroughSquare = getNeighboringSquare(startSquare, [1, 0])
-                var boardCopy = makeTestMove(boardState, startSquare, moveThroughSquare);
-                var threatSquare = checkThreat(boardCopy, moveThroughSquare, threatColor);
+                moveThroughSquare = getNeighboringSquare(startSquare, [1, 0]);
+                boardCopy = makeTestMove(boardState, startSquare, moveThroughSquare);
+                threatSquare = checkThreat(boardCopy, moveThroughSquare, threatColor);
                 if (threatSquare)
                     return [false, ["check", [threatSquare, moveThroughSquare]]];
             }
@@ -220,17 +225,17 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
                     || boardState[getNeighboringSquare(startSquare, [-3, 0])])
                 return false;
             else {
-                var threatColor = getOtherColor(pieceType.split(" ")[0]);
+                threatColor = getOtherColor(pieceType.split(" ")[0]);
                 // Check that there are no threats to the king or the square the king is
                 // moving through. Don't look at the square the king is moving to, that
                 // gets looked at later.
                 threatSquare = checkThreat(boardState, startSquare, threatColor);
                 if (threatSquare)
-                    return [false, ["check", [threatSquare, squareToCheck]]];
+                    return [false, ["check", [threatSquare, startSquare]]];
 
-                var moveThroughSquare = getNeighboringSquare(startSquare, [-1, 0])
-                var boardCopy = makeTestMove(boardState, startSquare, moveThroughSquare);
-                var threatSquare = checkThreat(boardCopy, moveThroughSquare, threatColor);
+                moveThroughSquare = getNeighboringSquare(startSquare, [-1, 0]);
+                boardCopy = makeTestMove(boardState, startSquare, moveThroughSquare);
+                threatSquare = checkThreat(boardCopy, moveThroughSquare, threatColor);
                 if (threatSquare)
                     return [false, ["check", [threatSquare, moveThroughSquare]]];
             }
@@ -246,8 +251,12 @@ function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleL
 function makeTestMove(boardState, startSquare, endSquare) {
     // Make a copy of the boardState
     var boardCopy = {};
-    for (let [square, pieceType] of Object.entries(boardState))
-        boardCopy[square] = pieceType;
+    for (var square in boardState) {
+        if (boardState.hasOwnProperty(square)) {
+            pieceType = boardState[square];
+            boardCopy[square] = pieceType;
+        }
+    }
 
     // Move the piece, capturing if necessary
     var pieceType = boardCopy[startSquare];
@@ -264,11 +273,14 @@ function checkThreat(boardState, square, color) {
     var castleLegality = {"A": false, "H": false};
 
     var pieceNameList = ["pawn", "rook", "knight", "bishop", "queen", "king"];
-    for (let pieceName of pieceNameList) {
+    for (var i = 0; i < pieceNameList.length; i ++) {
+        var pieceName = pieceNameList[i];
         var pieceType = color + " " + pieceName;
-        for (let pieceLoc of findPiece(boardState, pieceType)) {
+        var pieceLocList = findPiece(boardState, pieceType);
+        for (var j = 0; j < pieceLocList.length; j ++) {
+            var pieceLoc = pieceLocList[j];
             // If any piece is threatening the square, return its location
-            if (chessPieceMovable(boardState, pieceLoc, square, castleLegality))
+            if (chessPieceMovable(boardState, pieceLoc, square, lastMove, castleLegality))
                 return pieceLoc;
         }
     }
@@ -279,7 +291,7 @@ function checkThreat(boardState, square, color) {
 
 function checkCheck(boardState, color) {
     [kingLoc] = findPiece(boardState, color + " king");
-    var otherColor = getOtherColor(color)
+    var otherColor = getOtherColor(color);
     return checkThreat(boardState, kingLoc, otherColor);
 }
 
@@ -309,7 +321,7 @@ function chessMoveValidity(gameState, startSquare, endSquare) {
         return [false, ["turn", null]];
 
     // Make sure a piece can actually make the move specified
-    var moveLegality = chessPieceMovable(gameState.pieces, startSquare, endSquare, gameState.lastMove, castleLegality)
+    var moveLegality = chessPieceMovable(gameState.pieces, startSquare, endSquare, gameState.lastMove, castleLegality);
     if (!moveLegality)
         return [false, ["illegal", null]];
     else if (moveLegality[0] === false)
@@ -317,9 +329,9 @@ function chessMoveValidity(gameState, startSquare, endSquare) {
         return [false, moveLegality[1]];
 
     // Test out the move before actually making it to see if any issues arise
-    boardCopy = makeTestMove(gameState.pieces, startSquare, endSquare);
+    var boardCopy = makeTestMove(gameState.pieces, startSquare, endSquare);
     var checkingSquare = checkCheck(boardCopy, currentPlayer);
-    var kingSquare = findPiece(boardCopy, currentPlayer + " king")
+    var kingSquare = findPiece(boardCopy, currentPlayer + " king");
     // AJK TODO alert the user if there is checkmate
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
@@ -358,10 +370,9 @@ function makeMove(boardState, startSquare, endSquare) {
 function checkPromotion(gameState) {
     var boardState = gameState.pieces;
     var square = gameState.lastMove[1];
+    var pieceColor, pieceName;
+
     // Return true if the piece is a pawn on its last rank and false otherwise
     [pieceColor, pieceName] = boardState[square].split(" ");
-    if (((pieceColor === "white" && square[1] == 8) || (pieceColor === "black" && square[1] == 1)) && pieceName === "pawn")
-        return true;
-    else
-        return false;
+    return ((pieceColor === "white" && square[1] === "8") || (pieceColor === "black" && square[1] === "1")) && pieceName === "pawn";
 }

@@ -15,7 +15,6 @@
             }
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
-                var pieceType = $scope.gameState.pieces[$scope.firstClick];
                 var comments, moveValidity;
                 [moveValidity, comments] = shogiMoveValidity($scope.gameState, $scope.firstClick, squareName);
                 if (moveValidity) {
@@ -44,7 +43,7 @@
                     }
                 }
                 else {
-                    var errorType, errorDetails;
+                    var errorType, errorDetails, fromSquare, toSquare;
                     [errorType, errorDetails] = comments;
                     if (errorType === "check") {
                         [fromSquare, toSquare] = errorDetails;

@@ -24,13 +24,16 @@
       <h2>Game description string</h2>
       <div id="meta-controls" ng-if="gameName === null">
         <!--AJK TODO instructions saying what this does-->
-        <input type="text" ng-model="$parent.inputHash" size="60"/>
+        <label for="input-hash">Input a game description string to load a saved game.</label>
+        <input id="input-hash" type="text" ng-model="$parent.inputHash" size="60"/>
         <br/><br/>
         <button type="submit" ng-click="loadGame()">Load game from string</button>
         <button type="submit" ng-click="newGame('chess')">New chess game</button>
         <button type="submit" ng-click="newGame('shogi')">New shogi game</button>
       </div>
       <div ng-if="gameName !== null" ng-cloak>
+        <label for="output-hash">The game description string for this game; save this to load the game at a later date.</label>
+        <!--AJK TODO make this a directive-->
         <input id="output-hash" type="text" ng-model="$parent.outputHash" size="60" onclick="this.select()"/>
         <br/><br/>
         <button type="submit" ng-click="getGameString()">Get game string</button>
@@ -40,6 +43,7 @@
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
         <div id="chessboard" class="board board-8">
           <div ng-repeat="row in rows" class="row row-8">
+            <!--AJK TODO make the square description a directive-->
             <div id="ch-{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
               <div ng-if="gameState.pieces[column + row]" class="pc chess" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>

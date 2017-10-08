@@ -7,6 +7,8 @@
 
         $scope.firstClick = null;
         $scope.clickSquare = function(squareName) {
+            var comments, moveValidity, fromSquare, toSquare;
+
             if ($scope.firstClick === null) {
                 // If there is a piece on the chosen square, mark the square as selected
                 if ($scope.gameState.pieces[squareName]) {
@@ -46,8 +48,9 @@
                     if (errorType === "check") {
                         [fromSquare, toSquare] = errorDetails;
                         $("#ch-" + fromSquare).addClass("warning");
-                        setTimeout(function(){$("#ch-" + toSquare).addClass("warning");}, 400)
-                        setTimeout(function(){$("#ch-" + fromSquare).removeClass("warning");}, 400)
+                        // AJK TODO make this more abstracted, use the directive
+                        setTimeout(function(){$("#ch-" + toSquare).addClass("warning");}, 400);
+                        setTimeout(function(){$("#ch-" + fromSquare).removeClass("warning");}, 400);
                         setTimeout(function(){$("#ch-" + toSquare).removeClass("warning");}, 800)
                     }
                 }
