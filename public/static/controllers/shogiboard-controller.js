@@ -20,6 +20,7 @@
                 if (moveValidity) {
                     makeMove($scope.gameState.pieces, $scope.firstClick, squareName);
                     $scope.gameState.lastMove = [$scope.firstClick, squareName];
+                    $scope.upToDateString.value = false;
 
                     if (checkPromotion($scope.gameState)) {
                         $scope.gameState.promotablePawn = squareName;
