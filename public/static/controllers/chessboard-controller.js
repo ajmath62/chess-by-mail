@@ -5,7 +5,6 @@
         $scope.rows = [8, 7, 6, 5, 4, 3, 2, 1];
         $scope.columns = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
-        // AJK TODO look into directives for these and/or the chess-utils functions
         $scope.firstClick = null;
         $scope.clickSquare = function(squareName) {
             if ($scope.firstClick === null) {
@@ -16,8 +15,7 @@
             }
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
-                var pieceType = $scope.gameState.pieces[$scope.firstClick];
-                [moveValidity, comments] = checkMoveValidity($scope.gameState, $scope.firstClick, squareName);
+                [moveValidity, comments] = chessMoveValidity($scope.gameState, $scope.firstClick, squareName);
                 if (moveValidity) {
                     makeMove($scope.gameState.pieces, $scope.firstClick, squareName);
                     $scope.gameState.lastMove = [$scope.firstClick, squareName];

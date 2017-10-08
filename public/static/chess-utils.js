@@ -24,7 +24,7 @@ function getSquareDistance(startSquare, endSquare) {
     [startColumn, startRow] = startSquare;
     [endColumn, endRow] = endSquare;
     var numColumns = endColumn.charCodeAt() - startColumn.charCodeAt();
-    var numRows = endRow - startRow;  // this is an Int
+    var numRows = endRow.charCodeAt() - startRow.charCodeAt();
     return [numColumns, numRows];
 }
 
@@ -45,7 +45,7 @@ function getOtherColor(color) {
         return "white";
 }
 
-function isPieceMovable(boardState, startSquare, endSquare, lastMove, castleLegality) {
+function chessPieceMovable(boardState, startSquare, endSquare, lastMove, castleLegality) {
     var pieceType = boardState[startSquare];
     var pieceColor = pieceType.split(" ")[0];
     var moveDistance = getSquareDistance(startSquare, endSquare);
@@ -187,11 +187,7 @@ function isPieceMovable(boardState, startSquare, endSquare, lastMove, castleLega
         case "-1,-1":
         case "-1,0":
         case "-1,1":
-            if (contains(boardState[endSquare], pieceColor))
-                return false;
-            else {
-                return true;
-            }
+            return !contains(boardState[endSquare], pieceColor)
         case "2,0":
             if (!castleLegality.H)
                 return false;
@@ -243,7 +239,7 @@ function isPieceMovable(boardState, startSquare, endSquare, lastMove, castleLega
             return false;
         }
     default:
-        return true;
+        return false;
     }
 }
 
@@ -272,7 +268,7 @@ function checkThreat(boardState, square, color) {
         var pieceType = color + " " + pieceName;
         for (let pieceLoc of findPiece(boardState, pieceType)) {
             // If any piece is threatening the square, return its location
-            if (isPieceMovable(boardState, pieceLoc, square, castleLegality))
+            if (chessPieceMovable(boardState, pieceLoc, square, castleLegality))
                 return pieceLoc;
         }
     }
@@ -304,7 +300,7 @@ function newChessGame(gameState) {
     gameState.castleLegality = {"white": {"A": true, "H": true}, "black": {"A": true, "H": true}};
 }
 
-function checkMoveValidity(gameState, startSquare, endSquare) {
+function chessMoveValidity(gameState, startSquare, endSquare) {
     var currentPlayer = gameState.currentPlayer;
     var castleLegality = gameState.castleLegality[currentPlayer];
 
@@ -313,11 +309,11 @@ function checkMoveValidity(gameState, startSquare, endSquare) {
         return [false, ["turn", null]];
 
     // Make sure a piece can actually make the move specified
-    var moveLegality = isPieceMovable(gameState.pieces, startSquare, endSquare, gameState.lastMove, castleLegality)
+    var moveLegality = chessPieceMovable(gameState.pieces, startSquare, endSquare, gameState.lastMove, castleLegality)
     if (!moveLegality)
         return [false, ["illegal", null]];
     else if (moveLegality[0] === false)
-        // Pass along any comments from isPieceMovable
+        // Pass along any comments from chessPieceMovable
         return [false, moveLegality[1]];
 
     // Test out the move before actually making it to see if any issues arise
@@ -348,7 +344,7 @@ function checkMoveValidity(gameState, startSquare, endSquare) {
         gameState.castleLegality.black.A = false;
         gameState.castleLegality.black.H = false;
     }
-    // Allow the move to be made and pass along any comments from isPieceMovable
+    // Allow the move to be made and pass along any comments from chessPieceMovable
     return [true, moveLegality[1]];
 }
 
