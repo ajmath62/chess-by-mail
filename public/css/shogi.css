@@ -10,21 +10,35 @@
   color: black;
 }
 
-/* AJK TODO add promotions when I come to it */
-
 .pc.shogi.pawn.romaji:before {
+  content: "p";
+}
+
+.pc.shogi.pawn_.romaji:before {
   content: "P";
 }
 
 .pc.shogi.lance.romaji:before {
+  content: "l";
+}
+
+.pc.shogi.lance_.romaji:before {
   content: "L";
 }
 
 .pc.shogi.knight.romaji:before {
+  content: "n";
+}
+
+.pc.shogi.knight_.romaji:before {
   content: "N";
 }
 
 .pc.shogi.silver.romaji:before {
+  content: "s";
+}
+
+.pc.shogi.silver_.romaji:before {
   content: "S";
 }
 
@@ -33,10 +47,18 @@
 }
 
 .pc.shogi.bishop.romaji:before {
+  content: "b";
+}
+
+.pc.shogi.bishop_.romaji:before {
   content: "B";
 }
 
 .pc.shogi.rook.romaji:before {
+  content: "r";
+}
+
+.pc.shogi.rook_.romaji:before {
   content: "R";
 }
 
@@ -48,16 +70,32 @@
   content: "\6B69";
 }
 
+.pc.shogi.pawn_.kanji:before {
+  content: "\3068";
+}
+
 .pc.shogi.lance.kanji:before {
   content: "\9999";
+}
+
+.pc.shogi.lance_.kanji:before {
+  content: "\674F";
 }
 
 .pc.shogi.knight.kanji:before {
   content: "\6842";
 }
 
+.pc.shogi.knight_.kanji:before {
+  content: "\572D";
+}
+
 .pc.shogi.silver.kanji:before {
   content: "\9280";
+}
+
+.pc.shogi.silver_.kanji:before {
+  content: "\5168";
 }
 
 .pc.shogi.gold.kanji:before {
@@ -68,8 +106,16 @@
   content: "\89D2";
 }
 
+.pc.shogi.bishop_.kanji:before {
+  content: "\99AC";
+}
+
 .pc.shogi.rook.kanji:before {
   content: "\98DB";
+}
+
+.pc.shogi.rook_.kanji:before {
+  content: "\9F8D";
 }
 
 .pc.shogi.king.kanji:before {

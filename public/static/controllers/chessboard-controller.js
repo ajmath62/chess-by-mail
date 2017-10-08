@@ -33,15 +33,15 @@
 
                     // If the move was a castle, move the rook
                     if (comments === "castle-king")
-                        chess.makeMove($scope.gameState.pieces, getNeighboringSquare(squareName, [1, 0]), getNeighboringSquare(squareName, [-1, 0]));
+                        chess.makeMove($scope.gameState.pieces, chess.getNeighboringSquare(squareName, [1, 0]), chess.getNeighboringSquare(squareName, [-1, 0]));
                     else if (comments === "castle-queen")
-                        chess.makeMove($scope.gameState.pieces, getNeighboringSquare(squareName, [-2, 0]), getNeighboringSquare(squareName, [1, 0]));
+                        chess.makeMove($scope.gameState.pieces, chess.getNeighboringSquare(squareName, [-2, 0]), chess.getNeighboringSquare(squareName, [1, 0]));
                     // If the move was en passant, delete the captured pawn
                     else if (comments === "enpassant-white") {
-                        delete $scope.gameState.pieces[getNeighboringSquare(squareName, [0, -1])];
+                        delete $scope.gameState.pieces[chess.getNeighboringSquare(squareName, [0, -1])];
                     }
                     else if (comments === "enpassant-black") {
-                        delete $scope.gameState.pieces[getNeighboringSquare(squareName, [0, 1])];
+                        delete $scope.gameState.pieces[chess.getNeighboringSquare(squareName, [0, 1])];
                     }
                 }
                 else {

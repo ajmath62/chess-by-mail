@@ -22,13 +22,21 @@
                     $scope.gameState.lastMove = [$scope.firstClick, squareName];
                     $scope.upToDateString.value = false;
 
-                    if (shogi.checkPromotion($scope.gameState)) {
-                        $scope.gameState.promotablePawn = squareName;
-                    }
-                    else
-                        // If there is a promotion, flip whose turn it is after selecting which
-                        // piece to promote to. Otherwise, flip whose turn it is now.
+                    switch (shogi.checkPromotion($scope.gameState)) {
+                    case "forbidden":
                         $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+                        break;
+                    case "permitted":
+                        $scope.gameState.promotable = squareName;
+                        break;
+                    case "forced":
+                        console.log($scope.gameState.pieces[squareName]);
+                        $scope.gameState.pieces[squareName] += "_";
+                        $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+                        break;
+                    default:
+                        break;
+                    }
                 }
                 else {
                     var errorType, errorDetails, fromSquare, toSquare;
@@ -45,5 +53,13 @@
                 $scope.firstClick = null;
             }
         };
+
+        $scope.promote = function(actuallyPromote) {
+            // AJK TODO prevent the player from doing anything else in the meanwhile
+            if (actuallyPromote)
+                $scope.gameState.pieces[$scope.gameState.promotable] += "_";
+            $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+            $scope.gameState.promotable = "";
+        }
     }])
 }());

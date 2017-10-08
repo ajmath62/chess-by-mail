@@ -214,7 +214,7 @@ shogi.moveValidity = function(gameState, startSquare, endSquare) {
     if (!moveLegality)
         return [false, ["illegal", null]];
     else if (moveLegality[0] === false)
-        // Pass along any comments from shogiPieceMovable
+        // Pass along any comments from isPieceMovable
         return [false, moveLegality[1]];
 
     // Test out the move before actually making it to see if any issues arise
@@ -227,7 +227,7 @@ shogi.moveValidity = function(gameState, startSquare, endSquare) {
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];*/
 
-    // Allow the move to be made and pass along any comments from shogiPieceMovable
+    // Allow the move to be made and pass along any comments from isPieceMovable
     return [true, moveLegality[1]];
 };
 
@@ -239,6 +239,20 @@ shogi.makeMove = function(boardState, startSquare, endSquare) {
 };
 
 shogi.checkPromotion = function(gameState) {
-    // AJK TODO obviously incomplete
-    return false;
+    var promotionRanks = {"white": "GHI", "black": "ABC"};
+    var promotablePieces = ["pawn", "lance", "knight", "silver", "bishop", "rook"];
+    var promotionForcedRanks = {"white": {"pawn": "I", "lance": "I", "knight": "HI"}, "black": {"pawn": "A", "lance": "A", "knight": "AB"}};
+
+    var boardState = gameState.pieces;
+    var square = gameState.lastMove[1];
+    var pieceColor, pieceName;
+
+    [pieceColor, pieceName] = boardState[square].split(" ");
+    if (!contains(promotablePieces, pieceName))
+        return "forbidden";
+    else if (!contains(promotionRanks[pieceColor], square[1]))
+        return "forbidden";
+    else if (contains(promotionForcedRanks[pieceColor][pieceName], square[1]))
+        return "forced";
+    else return "permitted";
 };

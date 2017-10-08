@@ -43,7 +43,7 @@
       </div>
       <div ng-controller="ChessboardController" ng-if="gameName === 'chess'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
-        <div id="chessboard" class="board board-8">
+        <div id="chess-board" class="board board-8">
           <div ng-repeat="row in rows" class="row row-8">
             <div id="ch-{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
               <div ng-if="gameState.pieces[column + row]" class="pc chess" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
@@ -51,25 +51,31 @@
           </div>
         </div>
         <!--AJK TODO make this more visible/blocking-->
-        <div id="promotion-prompt" ng-if="gameState.promotablePawn">
+        <div id="chess-promotion-prompt" ng-if="gameState.promotablePawn">
           <br/>
           <p>You have promoted! Which piece would you like to promote to?</p>
           <div class="row">
             <div ng-repeat="pieceName in ['knight', 'bishop', 'rook', 'queen']" class="square white" ng-click="promote(pieceName)">
-              <div class="pc" ng-class="[gameState.currentPlayer, pieceName, gameState.pieceStyle]"></div>
+              <div class="pc chess" ng-class="[gameState.currentPlayer, pieceName, gameState.pieceStyle]"></div>
             </div>
           </div>
         </div>
       </div>
       <div ng-controller="ShogiController" ng-if="gameName === 'shogi'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
-        <div id="shogiboard" class="board board-9">
+        <div id="shogi-board" class="board board-9">
           <div ng-repeat="row in rows" class="row row-9">
             <!--AJK TODO add dots to mark promotion zones-->
             <div id="sh-{{ column + row }}" ng-repeat="column in columns" class="square white" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
               <div ng-if="gameState.pieces[column + row]" class="pc shogi" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>
           </div>
+        </div>
+        <div id="shogi-promotion-prompt" ng-if="gameState.promotable">
+          <br/>
+          <p>You can promote! Would you like to promote?</p>
+          <button type="button" ng-click="promote(true)">Yes</button>
+          <button type="button" ng-click="promote(false)">No</button>
         </div>
       </div>
       <br/><br/>
