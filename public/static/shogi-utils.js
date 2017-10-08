@@ -1,4 +1,6 @@
-function shogiGetNeighboringSquare(startSquare, directions) {
+shogi = {};
+
+shogi.getNeighboringSquare = function(startSquare, directions) {
     var oldColumn, oldRow, newColumn, newRow;
     [oldColumn, oldRow] = startSquare;
     newColumn = parseInt(oldColumn) + directions[0];
@@ -14,9 +16,9 @@ function shogiGetNeighboringSquare(startSquare, directions) {
     else {
         return newColumn + newRow;
     }
-}
+};
 
-function shogiPieceMovable(boardState, startSquare, endSquare) {
+shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
     var pieceType = boardState[startSquare];
     var pieceColor = pieceType.split(" ")[0];
     var moveDistance = getSquareDistance(startSquare, endSquare);
@@ -35,7 +37,7 @@ function shogiPieceMovable(boardState, startSquare, endSquare) {
         moveLength = moveDistance[1];
         for (i = 1; i < moveLength; i ++) {
             checkDistance = [0, i];
-            if (boardState[shogiGetNeighboringSquare(startSquare, checkDistance)])
+            if (boardState[shogi.getNeighboringSquare(startSquare, checkDistance)])
                 // The lance cannot move through other pieces
                 return false;
         }
@@ -49,7 +51,7 @@ function shogiPieceMovable(boardState, startSquare, endSquare) {
         moveLength = -moveDistance[1];
         for (i = 1; i < moveLength; i ++) {
             checkDistance = [0, -i];
-            if (boardState[shogiGetNeighboringSquare(startSquare, checkDistance)])
+            if (boardState[shogi.getNeighboringSquare(startSquare, checkDistance)])
                 // The lance cannot move through other pieces
                 return false;
         }
@@ -123,7 +125,7 @@ function shogiPieceMovable(boardState, startSquare, endSquare) {
         moveDirection = [Math.sign(moveDistance[0]), Math.sign(moveDistance[1])];
         for (i = 1; i < moveLength; i ++) {
             checkDistance = [moveDirection[0]*i, moveDirection[1]*i];
-            if (boardState[shogiGetNeighboringSquare(startSquare, checkDistance)])
+            if (boardState[shogi.getNeighboringSquare(startSquare, checkDistance)])
                 // The bishop cannot move through other pieces
                 return false;
         }
@@ -148,7 +150,7 @@ function shogiPieceMovable(boardState, startSquare, endSquare) {
 
         for (i = 1; i < moveLength; i ++) {
             checkDistance = [moveDirection[0]*i, moveDirection[1]*i];
-            if (boardState[shogiGetNeighboringSquare(startSquare, checkDistance)])
+            if (boardState[shogi.getNeighboringSquare(startSquare, checkDistance)])
                 // The rook cannot move through other pieces
                 return false;
         }
@@ -180,9 +182,9 @@ function shogiPieceMovable(boardState, startSquare, endSquare) {
     default:
         return false;
     }
-}
+};
 
-function newShogiGame(gameState) {
+shogi.newGame = function(gameState) {
     gameState.pieces = {"1A": "white lance", "2A": "white knight", "3A": "white silver",
     "4A": "white gold", "5A": "white king", "6A": "white gold", "7A": "white silver",
     "8A": "white knight", "9A": "white lance", "2B": "white bishop", "8B": "white rook",
@@ -198,9 +200,9 @@ function newShogiGame(gameState) {
     gameState.promotablePiece = "";
     gameState.lastMove = ["", ""];
     gameState.currentPlayer = "black";
-}
+};
 
-function shogiMoveValidity(gameState, startSquare, endSquare) {
+shogi.moveValidity = function(gameState, startSquare, endSquare) {
     var currentPlayer = gameState.currentPlayer;
 
     if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
@@ -208,7 +210,7 @@ function shogiMoveValidity(gameState, startSquare, endSquare) {
         return [false, ["turn", null]];
 
     // Make sure a piece can actually make the move specified
-    var moveLegality = shogiPieceMovable(gameState.pieces, startSquare, endSquare);
+    var moveLegality = shogi.isPieceMovable(gameState.pieces, startSquare, endSquare);
     if (!moveLegality)
         return [false, ["illegal", null]];
     else if (moveLegality[0] === false)
@@ -227,4 +229,16 @@ function shogiMoveValidity(gameState, startSquare, endSquare) {
 
     // Allow the move to be made and pass along any comments from shogiPieceMovable
     return [true, moveLegality[1]];
-}
+};
+
+shogi.makeMove = function(boardState, startSquare, endSquare) {
+    // Move the piece, capturing if necessary
+    var pieceType = boardState[startSquare];
+    delete boardState[startSquare];
+    boardState[endSquare] = pieceType;
+};
+
+shogi.checkPromotion = function(gameState) {
+    // AJK TODO obviously incomplete
+    return false;
+};

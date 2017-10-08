@@ -16,32 +16,19 @@
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
                 var comments, moveValidity;
-                [moveValidity, comments] = shogiMoveValidity($scope.gameState, $scope.firstClick, squareName);
+                [moveValidity, comments] = shogi.moveValidity($scope.gameState, $scope.firstClick, squareName);
                 if (moveValidity) {
-                    makeMove($scope.gameState.pieces, $scope.firstClick, squareName);
+                    shogi.makeMove($scope.gameState.pieces, $scope.firstClick, squareName);
                     $scope.gameState.lastMove = [$scope.firstClick, squareName];
                     $scope.upToDateString.value = false;
 
-                    if (checkPromotion($scope.gameState)) {
+                    if (shogi.checkPromotion($scope.gameState)) {
                         $scope.gameState.promotablePawn = squareName;
                     }
                     else
                         // If there is a promotion, flip whose turn it is after selecting which
                         // piece to promote to. Otherwise, flip whose turn it is now.
                         $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
-
-                    // If the move was a castle, move the rook
-                    if (comments === "castle-king")
-                        makeMove($scope.gameState.pieces, getNeighboringSquare(squareName, [1, 0]), getNeighboringSquare(squareName, [-1, 0]));
-                    else if (comments === "castle-queen")
-                        makeMove($scope.gameState.pieces, getNeighboringSquare(squareName, [-2, 0]), getNeighboringSquare(squareName, [1, 0]));
-                    // If the move was en passant, delete the captured pawn
-                    else if (comments === "enpassant-white") {
-                        delete $scope.gameState.pieces[getNeighboringSquare(squareName, [0, -1])];
-                    }
-                    else if (comments === "enpassant-black") {
-                        delete $scope.gameState.pieces[getNeighboringSquare(squareName, [0, 1])];
-                    }
                 }
                 else {
                     var errorType, errorDetails, fromSquare, toSquare;

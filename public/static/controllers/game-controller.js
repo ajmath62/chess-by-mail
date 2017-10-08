@@ -38,9 +38,9 @@
             $scope.upToDateString.value = true;
 
             if (gameName === "chess")
-                newChessGame($scope.gameState);
+                chess.newGame($scope.gameState);
             else if (gameName === "shogi")
-                newShogiGame($scope.gameState);
+                shogi.newGame($scope.gameState);
         };
     }]);
 }());
