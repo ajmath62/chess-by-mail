@@ -1,5 +1,3 @@
-shogi = {};
-
 shogi.promotionForcedRanks = {"white": {"pawn": "I", "lance": "I", "knight": "HI"}, "black": {"pawn": "A", "lance": "A", "knight": "AB"}};
 
 shogi.getNeighboringSquare = function(startSquare, directions) {

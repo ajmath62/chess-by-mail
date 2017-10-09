@@ -8,13 +8,13 @@
         $scope.upToDateString = {"value": null};
 
         $scope.goToMenu = function() {
-            var actuallyGo;
+            var confirmQuit;
             if ($scope.upToDateString.value)
-                actuallyGo = true;
+                confirmQuit = true;
             else
-                actuallyGo= confirm("This will erase any moves you may have made. Be sure that you have obtained an up-to-date game description string. Are you sure you want to return to the menu?");
+                confirmQuit= confirm("This will erase any moves you may have made. Be sure that you have obtained an up-to-date game description string. Are you sure you want to return to the menu?");
 
-            if (actuallyGo) {
+            if (confirmQuit) {
                 $scope.gameName = null;
                 $scope.gameState = {};
                 $scope.upToDateString.value = null;

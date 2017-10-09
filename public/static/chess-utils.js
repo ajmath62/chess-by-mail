@@ -1,5 +1,3 @@
-chess = {};
-
 chess.getNeighboringSquare = function(startSquare, directions) {
     var oldColumn, oldRow;
     [oldColumn, oldRow] = startSquare;
