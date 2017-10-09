@@ -31,7 +31,7 @@
                     $scope.upToDateString.value = false;
 
                     if (comments === "drop") {
-                        $scope.gameState.lastMove = ["", squareName];
+                        $scope.gameState.lastMove = ["*" + $scope.gameState.currentPlayer, squareName];
                         // AJK TODO write a method that just does this one thing
                         $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
                     }
