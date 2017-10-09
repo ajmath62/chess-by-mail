@@ -16,6 +16,7 @@
     <script src="static/controllers/chessboard-controller.js"></script>
     <script src="static/controllers/shogiboard-controller.js"></script>
     <script src="static/directives/hash-directives.js"></script>
+    <script src="static/directives/promotion-directive.js"></script>
     <!--Stylesheets-->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/chess.css">
@@ -50,16 +51,14 @@
             </div>
           </div>
         </div>
-        <!--AJK TODO make this more visible/blocking-->
-        <div id="chess-promotion-prompt" ng-if="gameState.promotablePawn">
-          <br/>
+        <gm-promotion id="chess-promotion-prompt" gm-if="gameState.promotable" ng-cloak>
           <p>You have promoted! Which piece would you like to promote to?</p>
           <div class="row">
             <div ng-repeat="pieceName in ['knight', 'bishop', 'rook', 'queen']" class="square white" ng-click="promote(pieceName)">
               <div class="pc chess" ng-class="[gameState.currentPlayer, pieceName, gameState.pieceStyle]"></div>
             </div>
           </div>
-        </div>
+        </gm-promotion>
       </div>
       <div ng-controller="ShogiController" ng-if="gameName === 'shogi'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
@@ -87,12 +86,15 @@
             <div class="pc shogi black" ng-class="[piece, gameState.pieceStyle]"></div>
           </div>
         </div>
-        <div id="shogi-promotion-prompt" ng-if="gameState.promotable">
+        <gm-promotion id="shogi-promotion-prompt" gm-if="gameState.promotable" ng-cloak>
+        <!--<div id="shogi-promotion-prompt" ng-if="gameState.promotable">-->
           <br/>
           <p>You can promote! Would you like to promote?</p>
-          <button type="button" ng-click="promote(true)">Yes</button>
-          <button type="button" ng-click="promote(false)">No</button>
-        </div>
+          <div class="button-holder">
+            <button class="nice" ng-click="promote(true)">Yes</button>
+            <button class="nice" ng-click="promote(false)">No</button>
+          </div>
+        </gm-promotion>
       </div>
       <br/><br/>
       <div id="piece-styler" ng-if="gameName !== null" ng-cloak>

@@ -4,7 +4,7 @@
     .directive("gmOutputHash", function(){
         return {
             restrict: "E",
-            replace: "true",
+            replace: true,
             template: "<input type=\"text\" size=\"60\"/>",
             link: function(scope, element, attrs) {
                 scope.$watch("gameState.lastMove", function(value) {

@@ -262,7 +262,7 @@ shogi.newGame = function(gameState) {
     "5I": "black king", "6I": "black gold", "7I": "black silver", "8I": "black knight",
     "9I": "black lance"};  // Starting position
     gameState.pieceStyle = "kanji";  // options are kanji or romaji
-    gameState.promotablePiece = "";
+    gameState.promotable = "";
     gameState.lastMove = ["", ""];
     gameState.inHand = {"white": [], "black": []};
     gameState.currentPlayer = "black";

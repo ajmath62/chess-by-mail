@@ -9,6 +9,10 @@
         $scope.clickSquare = function(squareName) {
             var comments, moveValidity, fromSquare, toSquare;
 
+            // If there is a promotion dialog open, don't allow other interaction
+            if ($scope.gameState.promotable)
+                return;
+
             if ($scope.firstClick === null) {
                 // If there is a piece on the chosen square, mark the square as selected
                 if ($scope.gameState.pieces[squareName]) {
@@ -24,7 +28,7 @@
                     $scope.upToDateString.value = false;
 
                     if (chess.checkPromotion($scope.gameState)) {
-                        $scope.gameState.promotablePawn = squareName;
+                        $scope.gameState.promotable = squareName;
                     }
                     else
                         // If there is a promotion, flip whose turn it is after selecting which
@@ -61,10 +65,9 @@
         };
 
         $scope.promote = function(pieceName) {
-            // AJK TODO prevent the player from doing anything else in the meanwhile
-            $scope.gameState.pieces[$scope.gameState.promotablePawn] = $scope.gameState.currentPlayer + " " + pieceName;
+            $scope.gameState.pieces[$scope.gameState.promotable] = $scope.gameState.currentPlayer + " " + pieceName;
             $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
-            $scope.gameState.promotablePawn = "";
+            $scope.gameState.promotable = "";
         }
     }]);
 }());

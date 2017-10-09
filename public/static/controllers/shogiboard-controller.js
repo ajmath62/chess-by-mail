@@ -10,6 +10,10 @@
             var squareName = $event.currentTarget.id;
             var isDrop = squareName.startsWith("*");
 
+            // If there is a promotion dialog open, don't allow other interaction
+            if ($scope.gameState.promotable)
+                return;
+
             if ($scope.firstClick === null) {
                 // If there is a piece on the chosen square, mark the square as selected
                 if ($scope.gameState.pieces[squareName] || isDrop) {
@@ -66,9 +70,8 @@
             }
         };
 
-        $scope.promote = function(actuallyPromote) {
-            // AJK TODO prevent the player from doing anything else in the meanwhile
-            if (actuallyPromote)
+        $scope.promote = function(userConfirm) {
+            if (userConfirm)
                 $scope.gameState.pieces[$scope.gameState.promotable] += "_";
             $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
             $scope.gameState.promotable = "";

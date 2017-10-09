@@ -273,7 +273,7 @@ chess.newGame = function(gameState) {
     "D8": "black queen", "E8": "black king", "F8": "black bishop", "G8": "black knight",
     "H8": "black rook"};  // Starting position
     gameState.pieceStyle = "symbol";  // options are symbol or letter
-    gameState.promotablePawn = "";
+    gameState.promotable = "";
     gameState.lastMove = ["", ""];
     gameState.currentPlayer = "white";
     gameState.castleLegality = {"white": {"A": true, "H": true}, "black": {"A": true, "H": true}};
