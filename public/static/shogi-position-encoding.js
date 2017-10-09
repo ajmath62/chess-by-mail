@@ -183,7 +183,6 @@ shogi.stringToGame = function(bitString) {
     var lastMoveStart = shogi.bitsToSquare(bitString.substr(currentBit, 7));
     var lastMoveEnd = shogi.bitsToSquare(bitString.substr(currentBit + 7, 7));
     gameState.lastMove = [lastMoveStart, lastMoveEnd];
-    console.log(gameState.lastMove);
     currentBit += 14;
 
     gameState.currentPlayer = shogi.colorList[parseInt(bitString.substr(currentBit, 1), 2)];

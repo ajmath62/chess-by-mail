@@ -122,6 +122,19 @@
   content: "\738B";
 }
 
+.shogi-promotion-zone {
+  position: absolute;
+  top: -14.5px;
+  left: -6.5px;
+  width: 24px;
+  height: 24px;
+}
+
+.shogi-promotion-zone:before {
+  font-size: 18px;
+  content: "\25CF";
+}
+
 .shogi-hand {
   height: 60px;
 }

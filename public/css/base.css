@@ -42,6 +42,7 @@ button.nice {
   display: inline-block;
   height: 78px;
   width: 78px;
+  position: relative;
 }
 
 .square.mini {

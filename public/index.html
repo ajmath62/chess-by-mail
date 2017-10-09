@@ -76,6 +76,7 @@
             <!--AJK TODO add dots to mark promotion zones-->
             <!--AJK TODO make a directive for the ng-classes here and elsewhere (selected, last-move etc.)-->
             <div id="{{ column + row }}" ng-repeat="column in columns" class="square white" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare($event)">
+              <div ng-if="'DG'.indexOf(row) !== -1 && '36'.indexOf(column) !== -1" class="shogi-promotion-zone" ></div>
               <div ng-if="gameState.pieces[column + row]" class="pc shogi" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>
           </div>
