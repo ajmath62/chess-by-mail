@@ -19,20 +19,16 @@ shogi.squareToBits = function(square) {
     }
 };
 
-
 shogi.pieceInfoToBits = function(pieceInfo) {
-    var colorBits, promotionBits;
+    var colorBits, promotionBits, squareBits;
     var square = pieceInfo[0];
-    if (square.substr(0, 1) === "*" || square === "") {
+    squareBits = shogi.squareToBits(square);
+    if (pieceInfo[1] === undefined)
         colorBits = "";
-        promotionBits = "";
-    }
-    else {
-        colorBits = integerToBits(shogi.colorList.indexOf(pieceInfo[1]), 1);
-        promotionBits = pieceInfo[2] ? "1" : "0";
-    }
-    var squareBits = shogi.squareToBits(square);
-    return squareBits + colorBits + promotionBits;
+    else colorBits = integerToBits(shogi.colorList.indexOf(pieceInfo[1]), 1);
+    promotionBits = pieceInfo[2] ? "11" : "";
+
+    return promotionBits + squareBits + colorBits;
 };
 
 shogi.pieceListToBits = function(pieceList, inHandList) {
@@ -112,6 +108,7 @@ shogi.gameToString = function(gameNameIndex, gameState) {
     for (var i = 0; i < finalBitString.length; i += 8) {
         finalByteArray.push(String.fromCharCode(parseInt(finalBitString.substr(i, 8), 2)))
     }
+    console.log(btoa(finalByteArray.join("")).length);
     return btoa(finalByteArray.join(""));  // length around 60
 };
 
@@ -135,13 +132,16 @@ shogi.bitsToPieceMapping = function(bitString) {
     var squareToPieceMapping = {};
     var inHandList = {"white": [], "black": []};
     var currentBit = 0;
-    var count, pieceType, square, squareBits;
+    var count, isPromoted, pieceType, square, squareBits;
 
     for (var pieceName in shogi.pieceNameCounter) {
         if (shogi.pieceNameCounter.hasOwnProperty(pieceName)) {
             count = shogi.pieceNameCounter[pieceName];
             for (var j = 0; j < count; j++) {
-                // pieceInfo = [square, pieceColor, isPromoted];
+                isPromoted = (bitString.substr(currentBit, 2) === "11");
+                if (isPromoted) {
+                    currentBit += 2;
+                }
                 squareBits = bitString.substr(currentBit, 7);
                 square = shogi.bitsToSquare(bitString.substr(currentBit, 7));
                 switch (square) {
@@ -158,10 +158,9 @@ shogi.bitsToPieceMapping = function(bitString) {
                     break;
                 default:
                     var pieceColor = shogi.colorList[bitString.substr(currentBit + 7, 1)];
-                    var isPromoted = Boolean(parseInt(bitString.substr(currentBit + 8, 1)));
                     pieceType = pieceColor + " " + pieceName + (isPromoted ? "_" : "");
                     squareToPieceMapping[square] = pieceType;
-                    currentBit += 9;
+                    currentBit += 8;
                     break;
                 }
             }
