@@ -206,7 +206,10 @@ shogi.isPieceMovable = function(boardState, startSquare, endSquare) {
     }
 };
 
-shogi.makeTestMove = function(boardState, startSquare, endSquare) {
+shogi.makeTestMove = function(boardState, startSquare, endSquare, inHand) {
+    var isDrop = startSquare.startsWith("*");
+    var dropIndex, pieceColor, pieceName, pieceType;
+
     // Make a copy of the boardState
     var boardCopy = {};
     for (var square in boardState) {
@@ -216,10 +219,19 @@ shogi.makeTestMove = function(boardState, startSquare, endSquare) {
         }
     }
 
-    // Move the piece, capturing if necessary
-    var pieceType = boardCopy[startSquare];
-    delete boardCopy[startSquare];
-    boardCopy[endSquare] = pieceType;
+    if (isDrop) {
+        [pieceColor, dropIndex] = startSquare.substr(1).split(" ");
+        pieceName = inHand[dropIndex];
+        pieceType = pieceColor + " " + pieceName;
+        boardCopy[endSquare] = pieceType;
+    }
+    else {
+        // Move the piece, capturing if necessary
+        pieceType = boardCopy[startSquare];
+        delete boardCopy[startSquare];
+        boardCopy[endSquare] = pieceType;
+    }
+
     return boardCopy;
 };
 
@@ -280,29 +292,33 @@ shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
         if (pieceColor !== currentPlayer)
             // A player can only move their own pieces
             return [false, ["turn", null]];
+
         pieceName = inHand[dropIndex];
         if (gameState.pieces[endSquare])
+            // A player cannot drop onto an occupied square
             return [false, ["illegal", null]];
-        if (contains(shogi.promotionForcedRanks[pieceColor][pieceName], endSquare[1])) return [false, ["illegal", null]];
+        if (contains(shogi.promotionForcedRanks[pieceColor][pieceName], endSquare[1]))
+            // A player cannot drop a piece somewhere it can't move (e.g. a black pawn on the ninth rank)
+            return [false, ["illegal", null]];
         // AJK TODO don't permit dropping a pawn into checkmate
         // AJK TODO don't permit dropping a pawn on a file with a pawn in it already
-        return [true, "drop"];
+    }
+    else {
+        if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
+            // A player can only move their own pieces
+            return [false, ["turn", null]];
+
+        // Make sure a piece can actually make the move specified
+        var moveLegality = shogi.isPieceMovable(gameState.pieces, startSquare, endSquare);
+        if (!moveLegality)
+            return [false, ["illegal", null]];
+        else if (moveLegality[0] === false)
+            // Pass along any comments from isPieceMovable
+            return [false, moveLegality[1]];
     }
 
-    if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
-        // A player can only move their own pieces
-        return [false, ["turn", null]];
-
-    // Make sure a piece can actually make the move specified
-    var moveLegality = shogi.isPieceMovable(gameState.pieces, startSquare, endSquare);
-    if (!moveLegality)
-        return [false, ["illegal", null]];
-    else if (moveLegality[0] === false)
-        // Pass along any comments from isPieceMovable
-        return [false, moveLegality[1]];
-
     // Test out the move before actually making it to see if any issues arise
-    var boardCopy = shogi.makeTestMove(gameState.pieces, startSquare, endSquare);
+    var boardCopy = shogi.makeTestMove(gameState.pieces, startSquare, endSquare, inHand);
     var checkingSquare = shogi.checkCheck(boardCopy, currentPlayer);
     var kingSquare = findPiece(boardCopy, currentPlayer + " king");
     // AJK TODO alert the player if there is checkmate
@@ -310,8 +326,8 @@ shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];
 
-    // Allow the move to be made
-    return [true, null];
+    // If the move hasn't been rejected, allow it to be made
+    return [true, isDrop ? "drop" : null];
 };
 
 shogi.makeMove = function(boardState, startSquare, endSquare, inHand) {

@@ -108,7 +108,6 @@ shogi.gameToString = function(gameNameIndex, gameState) {
     for (var i = 0; i < finalBitString.length; i += 8) {
         finalByteArray.push(String.fromCharCode(parseInt(finalBitString.substr(i, 8), 2)))
     }
-    console.log(btoa(finalByteArray.join("")).length);
     return btoa(finalByteArray.join(""));  // length around 60
 };
 
