@@ -259,6 +259,35 @@ shogi.checkCheck = function(boardState, color) {
     return shogi.checkThreat(boardState, kingLoc, otherColor);
 };
 
+shogi.checkStuck = function(gameState) {
+    // Check if the current player is stuck (i.e. they cannot move any of their pieces)
+    var boardState = gameState.pieces;
+    var currentPlayer = gameState.currentPlayer;
+    var rowList = "ABCDEFGHI";
+    var colList = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var pieceColor, startSquare, endSquare;
+
+    // Iterate over all of the current player's pieces and all squares on the board
+    for (startSquare in boardState) {
+        if (boardState.hasOwnProperty(startSquare)) {
+            pieceColor = boardState[startSquare].split(" ")[0];
+            if (pieceColor !== currentPlayer)
+                continue;
+            for (var row = 0; row < rowList.length; row ++) {
+                for (var col = 0; col < colList.length; col++) {
+                    endSquare = colList[col] + rowList[row];
+                    if (shogi.moveValidity(gameState, startSquare, endSquare)[0])
+                        // If the player can move that piece, they aren't stuck
+                        return false;
+                }
+            }
+        }
+    }
+
+    // If no pieces can move, the player is stuck (either checkmate or stalemate)
+    return true;
+};
+
 shogi.newGame = function(gameState) {
     gameState.pieces = {"1A": "white lance", "2A": "white knight", "3A": "white silver",
     "4A": "white gold", "5A": "white king", "6A": "white gold", "7A": "white silver",
@@ -321,7 +350,6 @@ shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
     var boardCopy = shogi.makeTestMove(gameState.pieces, startSquare, endSquare, inHand);
     var checkingSquare = shogi.checkCheck(boardCopy, currentPlayer);
     var kingSquare = findPiece(boardCopy, currentPlayer + " king");
-    // AJK TODO alert the player if there is checkmate (cf. chess code)
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];
@@ -374,4 +402,13 @@ shogi.checkPromotion = function(gameState) {
     else if (contains(shogi.promotionForcedRanks[pieceColor][pieceName], square[1]))
         return "forced";
     else return "permitted";
+};
+
+shogi.checkMate = function(gameState) {
+    if (shogi.checkStuck(gameState)) {
+        if (shogi.checkCheck(gameState.pieces, gameState.currentPlayer) === "")
+            return "stalemate";
+        else return "checkmate";
+    }
+    else return null;
 };

@@ -28,26 +28,22 @@
 
                 if (moveValidity) {
                     shogi.makeMove($scope.gameState.pieces, $scope.firstClick, squareName, playerHand);
-                    $scope.upToDateString.value = false;
 
                     if (comments === "drop") {
                         $scope.gameState.lastMove = ["*" + $scope.gameState.currentPlayer, squareName];
-                        // AJK TODO write a method that just does this one thing
-                        $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+                        $scope.moveCleanup();
                     }
                     else {
                         $scope.gameState.lastMove = [$scope.firstClick, squareName];
-
                         switch (shogi.checkPromotion($scope.gameState)) {
-                            case "forbidden":
-                                $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
-                                break;
                             case "permitted":
+                                // Don't finish the move until the user has made a decision
                                 $scope.gameState.promotable = squareName;
                                 break;
                             case "forced":
                                 $scope.gameState.pieces[squareName] += "_";
-                                $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+                            case "forbidden":
+                                $scope.moveCleanup();
                                 break;
                             default:
                                 break;
@@ -73,8 +69,16 @@
         $scope.promote = function(userConfirm) {
             if (userConfirm)
                 $scope.gameState.pieces[$scope.gameState.promotable] += "_";
-            $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
             $scope.gameState.promotable = "";
-        }
+            $scope.moveCleanup();
+        };
+
+        $scope.moveCleanup = function() {
+            // Flip turns. This will prompt the game string to be updated (see hash-directives.js)
+            $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+            $scope.upToDateString.value = false;
+
+            $scope.gameOver.value = shogi.checkMate($scope.gameState);
+        };
     }])
 }());

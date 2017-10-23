@@ -45,7 +45,7 @@
       </div>
       <div ng-controller="ChessboardController" ng-if="gameName === 'chess'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
-        <!--AJK TODO make this more than just a text box-->
+        <!--AJK TODO make this more than just a text box, and also the shogi one-->
         <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
         <div id="chess-board" class="board board-8">
           <div ng-repeat="row in rows" class="row row-8">
@@ -65,6 +65,7 @@
       </div>
       <div ng-controller="ShogiController" ng-if="gameName === 'shogi'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
+        <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
         <div id="white-hand" ng-if="gameState.inHand.white.length" class="shogi-hand">
           <div class="shogi-marker white"></div>
           <div id="*white {{ $index }}" ng-repeat="piece in gameState.inHand.white track by $index" class="square mini" ng-class="{'selected': firstClick === '*white ' + $index}" ng-click="clickSquare($event)">
