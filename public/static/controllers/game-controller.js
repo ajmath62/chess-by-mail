@@ -1,7 +1,8 @@
 (function(){
     angular
     .module("app", [])
-    .controller("GameController", ["$scope", function($scope){
+    .controller("GameController", ["$scope", "$rootScope", function($scope, $rootScope){
+        $rootScope.nightMode = {"value": true};
         $scope.gameName = null;
         $scope.inputHash = "";
         $scope.gameState = {};

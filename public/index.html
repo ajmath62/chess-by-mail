@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="css/chess.css">
     <link rel="stylesheet" href="css/shogi.css">
   </head>
-  <body>
+  <body class="{{ nightMode.value ? 'dark' : 'light' }}">
     <div ng-controller="GameController">
       <h2>Game description string</h2>
       <div id="meta-controls" ng-if="gameName === null">
@@ -106,6 +106,9 @@
         <label ng-if="gameName === 'shogi'"><input type="radio" ng-model="gameState.pieceStyle" value="kanji"/>Use kanji symbols</label>
         <label ng-if="gameName === 'shogi'"><input type="radio" ng-model="gameState.pieceStyle" value="romaji"/>Use latin abbreviations</label>
       </div>
+    </div>
+    <div id="night-mode" type="button">
+      <label><input type="checkbox" ng-model="nightMode.value"/>Night mode</label>
     </div>
   </body>
 </html>
