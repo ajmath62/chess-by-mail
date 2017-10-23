@@ -25,15 +25,6 @@
                 if (moveValidity) {
                     chess.makeMove($scope.gameState.pieces, $scope.firstClick, squareName);
                     $scope.gameState.lastMove = [$scope.firstClick, squareName];
-                    $scope.upToDateString.value = false;
-
-                    if (chess.checkPromotion($scope.gameState)) {
-                        $scope.gameState.promotable = squareName;
-                    }
-                    else
-                        // If there is a promotion, flip whose turn it is after selecting which
-                        // piece to promote to. Otherwise, flip whose turn it is now.
-                        $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
 
                     // If the move was a castle, move the rook
                     if (comments === "castle-king")
@@ -47,6 +38,13 @@
                     else if (comments === "enpassant-black") {
                         delete $scope.gameState.pieces[chess.getNeighboringSquare(squareName, [0, 1])];
                     }
+
+                    if (chess.checkPromotion($scope.gameState))
+                        // Don't end the move until the promotion has been completed
+                        $scope.gameState.promotable = squareName;
+                    else
+                        // End the move now
+                        $scope.moveCleanup();
                 }
                 else {
                     [errorType, errorDetails] = comments;
@@ -66,8 +64,16 @@
 
         $scope.promote = function(pieceName) {
             $scope.gameState.pieces[$scope.gameState.promotable] = $scope.gameState.currentPlayer + " " + pieceName;
-            $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
             $scope.gameState.promotable = "";
-        }
+            $scope.moveCleanup();
+        };
+
+        $scope.moveCleanup = function() {
+            // Flip turns. This will prompt the game string to be updated (see hash-directives.js)
+            $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+            $scope.upToDateString.value = false;
+
+            $scope.gameOver.value = chess.checkMate($scope.gameState);
+        };
     }]);
 }());

@@ -260,6 +260,35 @@ chess.checkCheck = function(boardState, color) {
     return chess.checkThreat(boardState, kingLoc, otherColor);
 };
 
+chess.checkStuck = function(gameState) {
+    // Check if the current player is stuck (i.e. they cannot move any of their pieces)
+    var boardState = gameState.pieces;
+    var currentPlayer = gameState.currentPlayer;
+    var rowList = [1, 2, 3, 4, 5, 6, 7, 8];
+    var colList = "ABCDEFGH";
+    var pieceColor, startSquare, endSquare;
+
+    // Iterate over all of the current player's pieces and all squares on the board
+    for (startSquare in boardState) {
+        if (boardState.hasOwnProperty(startSquare)) {
+            pieceColor = boardState[startSquare].split(" ")[0];
+            if (pieceColor !== currentPlayer)
+                continue;
+            for (var row = 0; row < rowList.length; row ++) {
+                for (var col = 0; col < colList.length; col++) {
+                    endSquare = colList[col] + rowList[row];
+                    if (chess.moveValidity(gameState, startSquare, endSquare)[0])
+                        // If the player can move that piece, they aren't stuck
+                        return false;
+                }
+            }
+        }
+    }
+
+    // If no pieces can move, the player is stuck (either checkmate or stalemate)
+    return true;
+};
+
 chess.newGame = function(gameState) {
     gameState.pieces = {"A1": "white rook", "B1": "white knight", "C1": "white bishop",
     "D1": "white queen", "E1": "white king", "F1": "white bishop", "G1": "white knight",
@@ -297,7 +326,6 @@ chess.moveValidity = function(gameState, startSquare, endSquare) {
     var boardCopy = chess.makeTestMove(gameState.pieces, startSquare, endSquare);
     var checkingSquare = chess.checkCheck(boardCopy, currentPlayer);
     var kingSquare = findPiece(boardCopy, currentPlayer + " king");
-    // AJK TODO alert the user if there is checkmate
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];
@@ -337,7 +365,20 @@ chess.checkPromotion = function(gameState) {
     var square = gameState.lastMove[1];
     var pieceColor, pieceName;
 
+    if (square === "")
+        // No move yet
+        return false;
+
     // Return true if the piece is a pawn on its last rank and false otherwise
     [pieceColor, pieceName] = boardState[square].split(" ");
     return ((pieceColor === "white" && square[1] === "8") || (pieceColor === "black" && square[1] === "1")) && pieceName === "pawn";
+};
+
+chess.checkMate = function(gameState) {
+    if (chess.checkStuck(gameState)) {
+        if (chess.checkCheck(gameState.pieces, gameState.currentPlayer) === "")
+            return "stalemate";
+        else return "checkmate";
+    }
+    else return null;
 };

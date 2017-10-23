@@ -5,6 +5,7 @@
         $scope.gameName = null;
         $scope.inputHash = "";
         $scope.gameState = {};
+        $scope.gameOver = {"value": null};
         $scope.upToDateString = {"value": null};
 
         $scope.goToMenu = function() {
@@ -16,7 +17,9 @@
 
             if (confirmQuit) {
                 $scope.gameName = null;
+                $scope.inputHash = "";
                 $scope.gameState = {};
+                $scope.gameOver = {"value": null};
                 $scope.upToDateString.value = null;
             }
         };
@@ -25,9 +28,11 @@
             try {
                 [$scope.gameName, $scope.gameState] = stringToGame($scope.inputHash);
                 $scope.inputHash = "";
+                $scope.gameOver = {"value": null};
                 $scope.upToDateString.value = true;
             }
             catch (e) {
+                console.log(e);
                 alert("Invalid game description string.");
             }
         };
@@ -35,6 +40,8 @@
         $scope.newGame = function(gameName) {
             $scope.gameName = gameName;
             $scope.inputHash = "";
+            $scope.gameState = {};
+            $scope.gameOver = {"value": null};
             $scope.upToDateString.value = true;
 
             if (gameName === "chess")

@@ -120,7 +120,7 @@ chess.bitsToPieceMapping = function(bitString) {
                             square = chess.bitsToSquare(bitString.substr(currentBit, 6));
                             squareToPieceMapping[square] = previousPieceType;
                             currentBit += 6;
-                            i--;
+                            j--;
                         }
                     }
                 }

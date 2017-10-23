@@ -7,8 +7,7 @@
             replace: true,
             template: "<input type=\"text\" size=\"60\"/>",
             link: function(scope, element, attrs) {
-                // AJK TODO only call this when a promotion is over. Maybe only update lastMove when a promotion is over?
-                scope.$watch("gameState.lastMove", function(value) {
+                scope.$watch("gameState.currentPlayer", function(value) {
                     var outputHash = gameToString(scope);
                     element.val(outputHash);
                 });
