@@ -2,10 +2,9 @@
     angular
     .module("app")
     .controller("XiangqiController", ["$scope", function($scope){
-        $scope.rows = [9, 8, 7, 6, 5, 4, 3, 2, 1];
-        $scope.columns = ["8", "7", "6", "5", "4", "3", "2", "1"];
+        $scope.rows = [9, 8, 7, 6, 5, 4, 3, 2, 1];  // and 0
+        $scope.columns = ["A", "B", "C", "D", "E", "F", "G", "H"];  // and I
 
-        $scope.upSlash = ["49", "58", "42", "51"];
-        $scope.downSlash = ["59", "48", "52", "41"];
+        $scope.slash = {D9: "down", E9: "up", D8: "up", E8: "down", D2: "down", E2: "up", D1: "up", E1: "down"};
     }]);
 }());

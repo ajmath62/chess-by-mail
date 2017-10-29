@@ -49,9 +49,8 @@
                 chess.newGame($scope.gameState);
             else if (gameName === "shogi")
                 shogi.newGame($scope.gameState);
-            else if (gameName === "xiangi"){
-                // AJK TODO add newGame function
-            }
+            else if (gameName === "xiangqi")
+                xiangqi.newGame($scope.gameState);
         };
     }]);
 }());

@@ -46,8 +46,9 @@ function integerToBits (integer, outputLength) {
 // Global scope variables to be used across the codebase
 chess = {};
 shogi = {};
+xiangqi = {};
 shiftBitLength = 11;
-gameNameList = ["chess", "shogi"];
+gameNameList = ["chess", "shogi", "xiangqi"];
 
 function gameToString(scope) {
     var chessIndex = gameNameList.indexOf("chess");

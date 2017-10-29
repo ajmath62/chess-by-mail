@@ -10,6 +10,7 @@
     <script src="static/game-utils.js"></script>
     <script src="static/chess-utils.js"></script>
     <script src="static/shogi-utils.js"></script>
+    <script src="static/xiangqi-utils.js"></script>
     <script src="static/chess-position-encoding.js"></script>
     <script src="static/shogi-position-encoding.js"></script>
     <!--Angular-->
@@ -47,7 +48,7 @@
         <br/><br/>
         <button type="submit" ng-click="goToMenu()">Return to menu</button>
         <br/><br/>
-        <h2 id="current-player" gm-flash>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
+        <h2 id="current-player" gm-flash>{{ gameState.currentPlayer[0].toUpperCase() + gameState.currentPlayer.substr(1) }} to play</h2>
       </div>
       <!--AJK TODO display game upside down depending on $scope.startingPlayer-->
       <div ng-controller="ChessController" ng-if="gameName === 'chess'" ng-cloak>
@@ -111,9 +112,13 @@
         <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
         <div id="xiangqi-board" class="board board-8x9">
           <div ng-repeat="row in rows" class="row row-8">
+            <!--AJK TODO yeah there really needs to be a directive for dealing with pieces-->
             <div id="{{ column + row }}" ng-repeat="column in columns" class="square black" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.includes(column + row), 'river': row === 5}" gm-flash ng-click="clickSquare(column + row)">
-              <div class="slash" ng-class="{'up-slash': upSlash.includes(column + row), 'down-slash': downSlash.includes(column + row)}"></div>
-              <div ng-if="gameState.pieces[column + row]" class="pc chess" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
+              <div ng-if="slash[column + row]" class="slash {{ slash[column + row] }}-slash"></div>
+              <div ng-if="gameState.pieces[column + row]" class="pc xiangqi" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
+              <div ng-if="column === 'H' && gameState.pieces['I' + row]" class="pc xiangqi right" ng-class="[gameState.pieces['I' + row], gameState.pieceStyle]"></div>
+              <div ng-if="row === 1 && gameState.pieces[column + 0]" class="pc xiangqi below" ng-class="[gameState.pieces[column + 0], gameState.pieceStyle]"></div>
+              <div ng-if="column === 'H' && row === 1 && gameState.pieces['I0']" class="pc xiangqi right below" ng-class="[gameState.pieces['I0'], gameState.pieceStyle]"></div>
             </div>
           </div>
         </div>

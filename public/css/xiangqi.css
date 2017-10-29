@@ -21,3 +21,57 @@
 .square .slash.down-slash:before {
   content: "\2572";
 }
+
+.pc.xiangqi {
+  font-size: 40px;
+  width: 60px;
+  height: 44px;
+  top: -30px;
+  left: -30px;
+  background-color: burlywood;
+  border-radius: 30px;
+}
+
+.pc.xiangqi.right {
+  left: 48px;
+}
+
+.pc.xiangqi.below {
+  top: 48px;
+}
+
+.pc.xiangqi.red {
+  color: red;
+}
+
+.pc.xiangqi.black {
+  color: black;
+}
+
+.pc.xiangqi.soldier:before {
+  content: "S";
+}
+
+.pc.xiangqi.cannon:before {
+  content: "C";
+}
+
+.pc.xiangqi.rook:before {
+  content: "R";
+}
+
+.pc.xiangqi.horse:before {
+  content: "H";
+}
+
+.pc.xiangqi.elephant:before {
+  content: "E";
+}
+
+.pc.xiangqi.advisor:before {
+  content: "A";
+}
+
+.pc.xiangqi.general:before {
+  content: "G";
+}
