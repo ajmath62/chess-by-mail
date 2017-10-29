@@ -16,6 +16,7 @@
     <script src="static/controllers/game-controller.js"></script>
     <script src="static/controllers/chessboard-controller.js"></script>
     <script src="static/controllers/shogiboard-controller.js"></script>
+    <script src="static/controllers/xiangqiboard-controller.js"></script>
     <script src="static/directives/hash-directives.js"></script>
     <script src="static/directives/promotion-directive.js"></script>
     <script src="static/directives/square-directives.js"></script>
@@ -23,6 +24,7 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/chess.css">
     <link rel="stylesheet" href="css/shogi.css">
+    <link rel="stylesheet" href="css/xiangqi.css">
   </head>
   <body class="{{ nightMode.value ? 'dark' : 'light' }}">
     <div ng-controller="GameController">
@@ -36,6 +38,7 @@
         <button type="submit" ng-click="loadGame()">Load game from string</button>
         <button type="submit" ng-click="newGame('chess')">New chess game</button>
         <button type="submit" ng-click="newGame('shogi')">New shogi game</button>
+        <button type="submit" ng-click="newGame('xiangqi')">New xiangqi game</button>
       </div>
       <div ng-if="gameName !== null" ng-cloak>
         <label for="output-hash">The description string for this game; save this to load the game at a later date.</label>
@@ -46,13 +49,14 @@
         <br/><br/>
         <h2 id="current-player" gm-flash>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
       </div>
-      <div ng-controller="ChessboardController" ng-if="gameName === 'chess'" ng-cloak>
+      <!--AJK TODO display game upside down depending on $scope.startingPlayer-->
+      <div ng-controller="ChessController" ng-if="gameName === 'chess'" ng-cloak>
         <!--AJK TODO make this more than just a text box, and also the shogi one-->
         <!--AJK TODO make stuff look better-->
         <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
         <div id="chess-board" class="board board-8">
           <div ng-repeat="row in rows" class="row row-8">
-            <div id="{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" gm-flash ng-click="clickSquare(column + row)">
+            <div id="{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.includes(column + row)}" gm-flash ng-click="clickSquare(column + row)">
               <div ng-if="gameState.pieces[column + row]" class="pc chess" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>
           </div>
@@ -80,7 +84,7 @@
         <div id="shogi-board" class="board board-9">
           <div ng-repeat="row in rows" class="row row-9">
             <!--AJK TODO make a directive for the ng-classes here and elsewhere (selected, last-move etc.)-->
-            <div id="{{ column + row }}" ng-repeat="column in columns" class="square white" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" gm-flash ng-click="clickSquare($event)">
+            <div id="{{ column + row }}" ng-repeat="column in columns" class="square white" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.includes(column + row)}" gm-flash ng-click="clickSquare($event)">
               <div ng-if="'DG'.indexOf(row) !== -1 && '36'.indexOf(column) !== -1" class="shogi-promotion-zone" ></div>
               <div ng-if="gameState.pieces[column + row]" class="pc shogi" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>
@@ -101,6 +105,18 @@
             <button class="nice" ng-click="promote(false)">No</button>
           </div>
         </gm-promotion>
+      </div>
+      <!--AJK TODO here adding xiangqi-->
+      <div ng-controller="XiangqiController" ng-if="gameName === 'xiangqi'" ng-cloak>
+        <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
+        <div id="xiangqi-board" class="board board-8x9">
+          <div ng-repeat="row in rows" class="row row-8">
+            <div id="{{ column + row }}" ng-repeat="column in columns" class="square black" ng-class="{'selected': firstClick === column + row, 'last-move': gameState.lastMove.includes(column + row), 'river': row === 5}" gm-flash ng-click="clickSquare(column + row)">
+              <div class="slash" ng-class="{'up-slash': upSlash.includes(column + row), 'down-slash': downSlash.includes(column + row)}"></div>
+              <div ng-if="gameState.pieces[column + row]" class="pc chess" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
+            </div>
+          </div>
+        </div>
       </div>
       <br/>
       <div id="piece-styler" ng-if="gameName !== null" ng-cloak>

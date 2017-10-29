@@ -1,7 +1,7 @@
 (function(){
     angular
     .module("app")
-    .controller("ChessboardController", ["$scope", function($scope){
+    .controller("ChessController", ["$scope", function($scope){
         $scope.rows = [8, 7, 6, 5, 4, 3, 2, 1];
         $scope.columns = ["A", "B", "C", "D", "E", "F", "G", "H"];
 

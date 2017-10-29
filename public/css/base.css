@@ -47,6 +47,11 @@ button.nice {
   width: 720px;
 }
 
+.board-8x9 {
+  height: 720px;
+  width: 640px;
+}
+
 .row-8 {
   width: 640px;
 }

@@ -1,0 +1,23 @@
+.square.river {
+  border-right-color: rgba(0, 0, 0, 0);
+  border-left-color: rgba(0, 0, 0, 0);
+}
+
+.square .slash {
+  font-size: 78px;
+  top: -24px;
+  width: 78px;
+  height: 78px;
+  padding-top: 0;
+  padding-bottom: 0;
+  text-align: center;
+  position: absolute;
+}
+
+.square .slash.up-slash:before {
+  content: "\2571";
+}
+
+.square .slash.down-slash:before {
+  content: "\2572";
+}
