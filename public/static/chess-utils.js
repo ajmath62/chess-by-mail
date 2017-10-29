@@ -332,6 +332,7 @@ chess.newGame = function(gameState) {
 chess.moveValidity = function(gameState, startSquare, endSquare) {
     var currentPlayer = gameState.currentPlayer;
     var castleLegality = gameState.castleLegality[currentPlayer];
+    var kingSquare;
 
     if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
         // A player can only move their own pieces
@@ -348,7 +349,7 @@ chess.moveValidity = function(gameState, startSquare, endSquare) {
     // Test out the move before actually making it to see if any issues arise
     var boardCopy = chess.makeTestMove(gameState.pieces, startSquare, endSquare);
     var checkingSquare = chess.checkCheck(boardCopy, currentPlayer);
-    var kingSquare = findPiece(boardCopy, currentPlayer + " king");
+    [kingSquare] = findPiece(boardCopy, currentPlayer + " king");
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];

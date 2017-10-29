@@ -41,8 +41,10 @@
                                 $scope.gameState.promotable = squareName;
                                 break;
                             case "forced":
+                                // Promote and then finish the move
                                 $scope.gameState.pieces[squareName] += "_";
                             case "forbidden":
+                                // Finish the move without promoting
                                 $scope.moveCleanup();
                                 break;
                             default:
@@ -51,15 +53,12 @@
                     }
                 }
                 else {
-                    var errorType, errorDetails, fromSquare, toSquare;
+                    var errorType, errorDetails;
                     [errorType, errorDetails] = comments;
-                    // AJK TODO make this a directive (and the chess one)
+                    // AJK TODO make this a more generic directive
+                    // AJK TODO make the chess one a directive too
                     if (errorType === "check") {
-                        [fromSquare, toSquare] = errorDetails;
-                        $("#" + fromSquare).addClass("warning");
-                        setTimeout(function(){$("#" + toSquare).addClass("warning");}, 400);
-                        setTimeout(function(){$("#" + fromSquare).removeClass("warning");}, 400);
-                        setTimeout(function(){$("#" + toSquare).removeClass("warning");}, 800);
+                        $scope.gameState.flash = errorDetails;
                     }
                 }
                 // Whether the move is valid or not, deselect the piece.

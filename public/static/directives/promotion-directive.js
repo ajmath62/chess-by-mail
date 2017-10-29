@@ -9,7 +9,7 @@
             scope: {
                 "gmIf": "="
             },
-            template: "<div ng-show='gmIf'><div class='gm-modal-background'></div><div class='gm-modal-dialog' ng-transclude></div></div>",
+            template: "<div ng-show='gmIf'><div class='gm-modal-background'></div><div class='gm-modal-dialog' ng-transclude></div></div>"
         };
     });
 }());

@@ -1,4 +1,4 @@
-(function() {
+(function(){
     angular
     .module("app")
     .directive("gmOutputHash", function(){
@@ -12,7 +12,7 @@
                     element.val(outputHash);
                 });
 
-                element.bind("click", function(event){
+                element.bind("click", function(event) {
                     scope.upToDateString.value = true;
                     element.select();
                 });

@@ -371,7 +371,7 @@ shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
     // Test out the move before actually making it to see if any issues arise
     var boardCopy = shogi.makeTestMove(gameState.pieces, startSquare, endSquare, inHand);
     var checkingSquare = shogi.checkCheck(boardCopy, currentPlayer);
-    kingSquare = findPiece(boardCopy, currentPlayer + " king");
+    [kingSquare] = findPiece(boardCopy, currentPlayer + " king");
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];
