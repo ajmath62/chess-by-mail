@@ -16,6 +16,28 @@ chess.getNeighboringSquare = function(startSquare, directions) {
     }
 };
 
+chess.updateCastleLegality = function(castleLegality, startSquare, endSquare) {
+    // If any rooks were moved or captured, don't allow future castling on that side
+    if (startSquare === "A1" || endSquare === "A1")
+        castleLegality.white.A = false;
+    if (startSquare === "H1" || endSquare === "H1")
+        castleLegality.white.H = false;
+    if (startSquare === "A8" || endSquare === "A8")
+        castleLegality.black.A = false;
+    if (startSquare === "H8" || endSquare === "H8")
+        castleLegality.black.H = false;
+
+    // If any kings were moved, don't allow future castling for that player
+    if (startSquare === "E1") {
+        castleLegality.white.A = false;
+        castleLegality.white.H = false;
+    }
+    if (startSquare === "E8") {
+        castleLegality.black.A = false;
+        castleLegality.black.H = false;
+    }
+};
+
 chess.isPieceMovable = function(boardState, startSquare, endSquare, lastMove, castleLegality) {
     var pieceType = boardState[startSquare];
     var pieceColor = pieceType.split(" ")[0];
@@ -331,34 +353,18 @@ chess.moveValidity = function(gameState, startSquare, endSquare) {
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];
 
-    // If any kings were moved, don't allow future castling for that player
-    // If any rooks were moved or captured, don't allow future castling on that side
-    // AJK TODO make this a subroutine, please
-    if (startSquare === "A1" || endSquare === "A1")
-        gameState.castleLegality.white.A = false;
-    if (startSquare === "H1" || endSquare === "H1")
-        gameState.castleLegality.white.H = false;
-    if (startSquare === "A8" || endSquare === "A8")
-        gameState.castleLegality.black.A = false;
-    if (startSquare === "H8" || endSquare === "H8")
-        gameState.castleLegality.black.H = false;
-    if (gameState.pieces[startSquare] === "white king") {
-        gameState.castleLegality.white.A = false;
-        gameState.castleLegality.white.H = false;
-    }
-    if (gameState.pieces[startSquare] === "black king") {
-        gameState.castleLegality.black.A = false;
-        gameState.castleLegality.black.H = false;
-    }
     // Allow the move to be made and pass along any comments from isPieceMovable
     return [true, moveLegality[1]];
 };
 
-chess.makeMove = function(boardState, startSquare, endSquare) {
+chess.makeMove = function(gameState, startSquare, endSquare) {
     // Move the piece, capturing if necessary
-    var pieceType = boardState[startSquare];
-    delete boardState[startSquare];
-    boardState[endSquare] = pieceType;
+    var pieceType = gameState.pieces[startSquare];
+    delete gameState.pieces[startSquare];
+    gameState.pieces[endSquare] = pieceType;
+
+    // Update castle legality
+    chess.updateCastleLegality(gameState.castleLegality, startSquare, endSquare);
 };
 
 chess.checkPromotion = function(gameState) {

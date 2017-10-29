@@ -23,14 +23,14 @@
                 // Attempt to move the previously selected piece to the newly chosen square
                 [moveValidity, comments] = chess.moveValidity($scope.gameState, $scope.firstClick, squareName);
                 if (moveValidity) {
-                    chess.makeMove($scope.gameState.pieces, $scope.firstClick, squareName);
+                    chess.makeMove($scope.gameState, $scope.firstClick, squareName);
                     $scope.gameState.lastMove = [$scope.firstClick, squareName];
 
                     // If the move was a castle, move the rook
                     if (comments === "castle-king")
-                        chess.makeMove($scope.gameState.pieces, chess.getNeighboringSquare(squareName, [1, 0]), chess.getNeighboringSquare(squareName, [-1, 0]));
+                        chess.makeMove($scope.gameState, chess.getNeighboringSquare(squareName, [1, 0]), chess.getNeighboringSquare(squareName, [-1, 0]));
                     else if (comments === "castle-queen")
-                        chess.makeMove($scope.gameState.pieces, chess.getNeighboringSquare(squareName, [-2, 0]), chess.getNeighboringSquare(squareName, [1, 0]));
+                        chess.makeMove($scope.gameState, chess.getNeighboringSquare(squareName, [-2, 0]), chess.getNeighboringSquare(squareName, [1, 0]));
                     // If the move was en passant, delete the captured pawn
                     else if (comments === "enpassant-white") {
                         delete $scope.gameState.pieces[chess.getNeighboringSquare(squareName, [0, -1])];

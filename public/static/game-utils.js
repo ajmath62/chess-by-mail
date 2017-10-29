@@ -1,7 +1,8 @@
-// AJK TODO this may be replaceable with String.prototype.includes
-function contains(array, object) {
-    // Return true if array exists and is indexable and contains object
-    return Boolean(array && array.indexOf && array.indexOf(object) !== -1);
+function contains(container, object) {
+    // Return true if container exists and is indexable and contains object
+    // Note that if for some reason container has an attribute indexOf that isn't
+    // a function, this will raise a TypeError.
+    return Boolean(container && container.indexOf && container.indexOf(object) !== -1);
 }
 
 function getSquareDistance(startSquare, endSquare) {
