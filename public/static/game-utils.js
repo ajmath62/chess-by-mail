@@ -33,6 +33,10 @@ function getOtherColor(color) {
         return "white";
 }
 
+function flipPlayer(gameState) {
+    gameState.currentPlayer = getOtherColor(gameState.currentPlayer);
+}
+
 function integerToBits (integer, outputLength) {
     // Convert the number to binary, remove extra bits if it's too long and add extra 0s if it's too short
     return integer.toString(2).substr(0, outputLength).padStart(outputLength, "0");

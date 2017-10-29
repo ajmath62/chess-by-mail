@@ -255,9 +255,10 @@ chess.checkThreat = function(boardState, square, color) {
 };
 
 chess.checkCheck = function(boardState, color) {
-    [kingLoc] = findPiece(boardState, color + " king");
+    var kingSquare;
+    [kingSquare] = findPiece(boardState, color + " king");
     var otherColor = getOtherColor(color);
-    return chess.checkThreat(boardState, kingLoc, otherColor);
+    return chess.checkThreat(boardState, kingSquare, otherColor);
 };
 
 chess.checkStuck = function(gameState) {

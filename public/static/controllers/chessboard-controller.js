@@ -70,7 +70,7 @@
 
         $scope.moveCleanup = function() {
             // Flip turns. This will prompt the game string to be updated (see hash-directives.js)
-            $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+            flipPlayer($scope.gameState);
             $scope.upToDateString.value = false;
 
             $scope.gameOver.value = chess.checkMate($scope.gameState);

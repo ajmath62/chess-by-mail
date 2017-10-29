@@ -254,9 +254,10 @@ shogi.checkThreat = function(boardState, square, color) {
 };
 
 shogi.checkCheck = function(boardState, color) {
-    [kingLoc] = findPiece(boardState, color + " king");
+    var kingSquare;
+    [kingSquare] = findPiece(boardState, color + " king");
     var otherColor = getOtherColor(color);
-    return shogi.checkThreat(boardState, kingLoc, otherColor);
+    return shogi.checkThreat(boardState, kingSquare, otherColor);
 };
 
 shogi.checkStuck = function(gameState) {
@@ -310,7 +311,7 @@ shogi.newGame = function(gameState) {
 shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
     var currentPlayer = gameState.currentPlayer;
     var isDrop = startSquare.startsWith("*");
-    var dropIndex, pieceColor, pieceName;
+    var dropIndex, kingSquare, pieceColor, pieceName;
 
     if (endSquare.startsWith("*"))
         // Can't move a piece to a player's hand
@@ -329,8 +330,29 @@ shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
         if (contains(shogi.promotionForcedRanks[pieceColor][pieceName], endSquare[1]))
             // A player cannot drop a piece somewhere it can't move (e.g. a black pawn on the ninth rank)
             return [false, ["illegal", null]];
-        // AJK TODO don't permit dropping a pawn into checkmate
-        // AJK TODO don't permit dropping a pawn on a file with a pawn in it already
+        if (pieceName === "pawn") {
+            // A player cannot drop a pawn if there is an unpromoted pawn in the same column
+            var col = endSquare[0];
+            for (var rowNum = 0; rowNum < 9; rowNum++) {
+                var row = "ABCDEFGHI"[rowNum];
+                if (gameState.pieces[col + row] === currentPlayer + " pawn")
+                    return [false, ["check", [col + row]]];
+            }
+
+            // Test dropping the pawn and see if it would result in checkmate
+            gameState.pieces[endSquare] = pieceColor + " " + pieceName;
+            flipPlayer(gameState);
+            var mateStatus = shogi.checkMate(gameState);
+            // Undo the test changes made above
+            delete gameState.pieces[endSquare];
+            flipPlayer(gameState);
+
+            if (mateStatus === "checkmate") {
+                // A player cannot get checkmate by dropping a pawn
+                [kingSquare] = findPiece(gameState.pieces, getOtherColor(currentPlayer) + " king");
+                return [false, ["check", [endSquare, kingSquare]]];
+            }
+        }
     }
     else {
         if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
@@ -349,7 +371,7 @@ shogi.moveValidity = function(gameState, startSquare, endSquare, inHand) {
     // Test out the move before actually making it to see if any issues arise
     var boardCopy = shogi.makeTestMove(gameState.pieces, startSquare, endSquare, inHand);
     var checkingSquare = shogi.checkCheck(boardCopy, currentPlayer);
-    var kingSquare = findPiece(boardCopy, currentPlayer + " king");
+    kingSquare = findPiece(boardCopy, currentPlayer + " king");
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
         return [false, ["check", [checkingSquare, kingSquare]]];

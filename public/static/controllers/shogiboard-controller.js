@@ -53,6 +53,7 @@
                 else {
                     var errorType, errorDetails, fromSquare, toSquare;
                     [errorType, errorDetails] = comments;
+                    // AJK TODO make this a directive (and the chess one)
                     if (errorType === "check") {
                         [fromSquare, toSquare] = errorDetails;
                         $("#" + fromSquare).addClass("warning");
@@ -75,7 +76,7 @@
 
         $scope.moveCleanup = function() {
             // Flip turns. This will prompt the game string to be updated (see hash-directives.js)
-            $scope.gameState.currentPlayer = getOtherColor($scope.gameState.currentPlayer);
+            flipPlayer($scope.gameState);
             $scope.upToDateString.value = false;
 
             $scope.gameOver.value = shogi.checkMate($scope.gameState);
