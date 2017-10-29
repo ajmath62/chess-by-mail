@@ -59,7 +59,7 @@ chess.isPieceMovable = function(boardState, startSquare, endSquare, lastMove, ca
                 && lastMove[1] === chess.getNeighboringSquare(endSquare, [0, -1])
                 && boardState[chess.getNeighboringSquare(endSquare, [0, -1])] === "black pawn")
                 // The last move was a pawn move over the square where this pawn is moving
-                return [true, "enpassant-white"];
+                return {validity: true, details: "enpassant-white"};
             else
                 return false;
         default:
@@ -79,7 +79,7 @@ chess.isPieceMovable = function(boardState, startSquare, endSquare, lastMove, ca
                 && lastMove[1] === chess.getNeighboringSquare(endSquare, [0, 1])
                 && boardState[chess.getNeighboringSquare(endSquare, [0, 1])] === "white pawn")
                 // The last move was a pawn move over the square where this pawn is moving
-                return [true, "enpassant-black"];
+                return {validity: true, details: "enpassant-black"};
             else
                 return false;
         default:
@@ -185,7 +185,7 @@ chess.isPieceMovable = function(boardState, startSquare, endSquare, lastMove, ca
         case "2,0":
             if (!castleLegality.H)
                 return false;
-            // Make sure there are no squares between the king and the rook
+            // Make sure there are no pieces between the king and the rook
             else if (boardState[chess.getNeighboringSquare(startSquare, [1, 0])]
                     || boardState[chess.getNeighboringSquare(startSquare, [2, 0])])
                 return false;
@@ -196,19 +196,19 @@ chess.isPieceMovable = function(boardState, startSquare, endSquare, lastMove, ca
                 // gets looked at later.
                 threatSquare = chess.checkThreat(boardState, startSquare, threatColor);
                 if (threatSquare)
-                    return [false, ["check", [threatSquare, startSquare]]];
+                    return {validity: false, reason: "check", details: [threatSquare, startSquare]};
 
                 moveThroughSquare = chess.getNeighboringSquare(startSquare, [1, 0]);
                 boardCopy = chess.makeTestMove(boardState, startSquare, moveThroughSquare);
                 threatSquare = chess.checkThreat(boardCopy, moveThroughSquare, threatColor);
                 if (threatSquare)
-                    return [false, ["check", [threatSquare, moveThroughSquare]]];
+                    return {validity: false, reason: "check", details: [threatSquare, moveThroughSquare]};
             }
-            return [true, "castle-king"];
+            return {validity: true, details: "castle-king"};
         case "-2,0":
             if (!castleLegality.A)
                 return false;
-            // Make sure there are no squares between the king and the rook
+            // Make sure there are no pieces between the king and the rook
             else if (boardState[chess.getNeighboringSquare(startSquare, [-1, 0])]
                     || boardState[chess.getNeighboringSquare(startSquare, [-2, 0])]
                     || boardState[chess.getNeighboringSquare(startSquare, [-3, 0])])
@@ -220,15 +220,15 @@ chess.isPieceMovable = function(boardState, startSquare, endSquare, lastMove, ca
                 // gets looked at later.
                 threatSquare = chess.checkThreat(boardState, startSquare, threatColor);
                 if (threatSquare)
-                    return [false, ["check", [threatSquare, startSquare]]];
+                    return {validity: false, reason: "check", details: [threatSquare, startSquare]};
 
                 moveThroughSquare = chess.getNeighboringSquare(startSquare, [-1, 0]);
                 boardCopy = chess.makeTestMove(boardState, startSquare, moveThroughSquare);
                 threatSquare = chess.checkThreat(boardCopy, moveThroughSquare, threatColor);
                 if (threatSquare)
-                    return [false, ["check", [threatSquare, moveThroughSquare]]];
+                    return {validity: false, reason: "check", details: [threatSquare, moveThroughSquare]};
             }
-            return [true, "castle-queen"];
+            return {validity: true, details: "castle-queen"};
         default:
             return false;
         }
@@ -334,17 +334,22 @@ chess.moveValidity = function(gameState, startSquare, endSquare) {
     var castleLegality = gameState.castleLegality[currentPlayer];
     var kingSquare;
 
+    if (startSquare === endSquare)
+        // Can't move a piece to itself
+        // This could be accidental or canceling out an incorrect piece selection
+        return {validity: false, reason: null};
+
     if (gameState.pieces[startSquare].split(" ")[0] !== currentPlayer)
         // A player can only move their own pieces
-        return [false, ["turn", null]];
+        return {validity: false, reason: "out of turn"};
 
     // Make sure a piece can actually make the move specified
     var moveLegality = chess.isPieceMovable(gameState.pieces, startSquare, endSquare, gameState.lastMove, castleLegality);
     if (!moveLegality)
-        return [false, ["illegal", null]];
-    else if (moveLegality[0] === false)
+        return {validity: false, reason: "illegal move"};
+    else if (moveLegality.validity === false)
         // Pass along any comments from isPieceMovable
-        return [false, moveLegality[1]];
+        return moveLegality;
 
     // Test out the move before actually making it to see if any issues arise
     var boardCopy = chess.makeTestMove(gameState.pieces, startSquare, endSquare);
@@ -352,10 +357,12 @@ chess.moveValidity = function(gameState, startSquare, endSquare) {
     [kingSquare] = findPiece(boardCopy, currentPlayer + " king");
     if (checkingSquare)
         // Don't let a player make a move that will put them in check or leave them in check
-        return [false, ["check", [checkingSquare, kingSquare]]];
+        return {validity: false, reason: "check", details: [checkingSquare, kingSquare]};
 
     // Allow the move to be made and pass along any comments from isPieceMovable
-    return [true, moveLegality[1]];
+    if (moveLegality === true)
+        return {validity: true, details: null};
+    else return moveLegality;
 };
 
 chess.makeMove = function(gameState, startSquare, endSquare) {

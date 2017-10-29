@@ -13,7 +13,7 @@ h2 {
 }
 
 .warning {
-  background-color: brown;
+  background-color: brown!important;  /*overrides other coloring e.g. last-move*/
 }
 
 .button-holder {

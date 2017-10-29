@@ -44,15 +44,15 @@
         <br/><br/>
         <button type="submit" ng-click="goToMenu()">Return to menu</button>
         <br/><br/>
+        <h2 id="current-player" gm-flash>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
       </div>
       <div ng-controller="ChessboardController" ng-if="gameName === 'chess'" ng-cloak>
-        <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
         <!--AJK TODO make this more than just a text box, and also the shogi one-->
         <!--AJK TODO make stuff look better-->
         <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
         <div id="chess-board" class="board board-8">
           <div ng-repeat="row in rows" class="row row-8">
-            <div id="ch-{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" ng-click="clickSquare(column + row)">
+            <div id="{{ column + row }}" ng-repeat="column in columns" class="square" ng-class="{'white': ($even && $parent.$even) || ($odd && $parent.$odd), 'black': ($even && $parent.$odd) || ($odd && $parent.$even), 'selected': firstClick === column + row, 'last-move': gameState.lastMove.indexOf(column + row) !== -1}" gm-flash ng-click="clickSquare(column + row)">
               <div ng-if="gameState.pieces[column + row]" class="pc chess" ng-class="[gameState.pieces[column + row], gameState.pieceStyle]"></div>
             </div>
           </div>
@@ -67,7 +67,6 @@
         </gm-promotion>
       </div>
       <div ng-controller="ShogiController" ng-if="gameName === 'shogi'" ng-cloak>
-        <h2 id="current-player" gm-flash>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
         <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
         <br/>
         <div id="white-hand" class="shogi-hand">

@@ -52,8 +52,6 @@
                     }
                 }
                 else {
-                    // AJK TODO make the chess one a directive too
-                    console.log(moveValidity);
                     switch(moveValidity.reason) {
                     case "check":
                     case "double pawn":

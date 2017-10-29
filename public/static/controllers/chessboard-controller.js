@@ -21,22 +21,29 @@
             }
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
-                [moveValidity, comments] = chess.moveValidity($scope.gameState, $scope.firstClick, squareName);
-                if (moveValidity) {
+                moveValidity = chess.moveValidity($scope.gameState, $scope.firstClick, squareName);
+
+                if (moveValidity.validity) {
                     chess.makeMove($scope.gameState, $scope.firstClick, squareName);
                     $scope.gameState.lastMove = [$scope.firstClick, squareName];
 
+                    switch(moveValidity.details) {
                     // If the move was a castle, move the rook
-                    if (comments === "castle-king")
+                    case "castle-king":
                         chess.makeMove($scope.gameState, chess.getNeighboringSquare(squareName, [1, 0]), chess.getNeighboringSquare(squareName, [-1, 0]));
-                    else if (comments === "castle-queen")
+                        break;
+                    case "castle-queen":
                         chess.makeMove($scope.gameState, chess.getNeighboringSquare(squareName, [-2, 0]), chess.getNeighboringSquare(squareName, [1, 0]));
+                        break;
                     // If the move was en passant, delete the captured pawn
-                    else if (comments === "enpassant-white") {
+                    case "enpassant-white":
                         delete $scope.gameState.pieces[chess.getNeighboringSquare(squareName, [0, -1])];
-                    }
-                    else if (comments === "enpassant-black") {
+                        break;
+                    case "enpassant-black":
                         delete $scope.gameState.pieces[chess.getNeighboringSquare(squareName, [0, 1])];
+                        break;
+                    default:
+                        break;
                     }
 
                     if (chess.checkPromotion($scope.gameState))
@@ -47,14 +54,19 @@
                         $scope.moveCleanup();
                 }
                 else {
-                    [errorType, errorDetails] = comments;
-                    if (errorType === "check") {
-                        [fromSquare, toSquare] = errorDetails;
-                        // Flash the two squares involved to alert the player why their move is illegal
-                        $("#ch-" + fromSquare).addClass("warning");
-                        setTimeout(function(){$("#ch-" + toSquare).addClass("warning");}, 400);
-                        setTimeout(function(){$("#ch-" + fromSquare).removeClass("warning");}, 400);
-                        setTimeout(function(){$("#ch-" + toSquare).removeClass("warning");}, 800)
+                    switch(moveValidity.reason) {
+                    case "check":
+                        // Flash the offending squares
+                        $scope.gameState.flash = moveValidity.details;
+                        break;
+                    case "out of turn":
+                        // Flash the White/Black to play sign
+                        $scope.gameState.flash = ["current-player"];
+                        break;
+                    case "illegal move":
+                        break;
+                    default:
+                        break;
                     }
                 }
                 // Whether the move is valid or not, deselect the piece.
