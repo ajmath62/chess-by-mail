@@ -136,7 +136,9 @@
 }
 
 .shogi-hand {
+  display: inline-block;
   height: 60px;
+  padding-left: 15px;
 }
 
 .shogi-marker {

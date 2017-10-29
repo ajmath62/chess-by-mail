@@ -6,6 +6,16 @@ body.light {
   background-color: bisque;
 }
 
+h2 {
+  display: inline-block;
+  padding: 15px;
+  margin: 0;
+}
+
+.warning {
+  background-color: brown;
+}
+
 .button-holder {
   width: 250px;
   height: 80px;
@@ -74,10 +84,6 @@ button.nice {
 
 .square.selected {
   background-color: lightblue;
-}
-
-.square.warning {
-  background-color: brown;
 }
 
 /* AJK TODO test this on different browsers, the padding isn't great on e.g. Firefox */

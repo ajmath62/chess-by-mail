@@ -43,10 +43,12 @@
         <gm-output-hash id="output-hash"></gm-output-hash>
         <br/><br/>
         <button type="submit" ng-click="goToMenu()">Return to menu</button>
+        <br/><br/>
       </div>
       <div ng-controller="ChessboardController" ng-if="gameName === 'chess'" ng-cloak>
         <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
         <!--AJK TODO make this more than just a text box, and also the shogi one-->
+        <!--AJK TODO make stuff look better-->
         <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
         <div id="chess-board" class="board board-8">
           <div ng-repeat="row in rows" class="row row-8">
@@ -65,9 +67,10 @@
         </gm-promotion>
       </div>
       <div ng-controller="ShogiController" ng-if="gameName === 'shogi'" ng-cloak>
-        <h2>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
+        <h2 id="current-player" gm-flash>{{ gameState.currentPlayer === "white" ? "White" : "Black" }} to play</h2>
         <h3 ng-if="gameOver.value">{{ gameOver.value }}</h3>
-        <div id="white-hand" ng-if="gameState.inHand.white.length" class="shogi-hand">
+        <br/>
+        <div id="white-hand" class="shogi-hand">
           <div class="shogi-marker white"></div>
           <div id="*white {{ $index }}" ng-repeat="piece in gameState.inHand.white track by $index" class="square mini" ng-class="{'selected': firstClick === '*white ' + $index}" ng-click="clickSquare($event)">
             <!--div.black so that the piece is right side up-->
@@ -84,8 +87,7 @@
             </div>
           </div>
         </div>
-        <br/>
-        <div id="black-hand" ng-if="gameState.inHand.black.length" class="shogi-hand">
+        <div id="black-hand" class="shogi-hand">
           <div class="shogi-marker black"></div>
           <div id="*black {{ $index }}" ng-repeat="piece in gameState.inHand.black track by $index" class="square mini" ng-class="{'selected': firstClick === '*black ' + $index}" ng-click="clickSquare($event)">
             <div class="pc shogi black" ng-class="[piece, gameState.pieceStyle]"></div>
@@ -101,7 +103,7 @@
           </div>
         </gm-promotion>
       </div>
-      <br/><br/>
+      <br/>
       <div id="piece-styler" ng-if="gameName !== null" ng-cloak>
         <label ng-if="gameName === 'chess'"><input type="radio" ng-model="gameState.pieceStyle" value="symbol"/>Use piece symbols</label>
         <label ng-if="gameName === 'chess'"><input type="radio" ng-model="gameState.pieceStyle" value="letter"/>Use piece letter abbreviations</label>

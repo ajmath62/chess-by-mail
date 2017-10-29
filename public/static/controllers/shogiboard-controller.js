@@ -23,13 +23,12 @@
             else {
                 // Attempt to move the previously selected piece to the newly chosen square
                 var playerHand = $scope.gameState.inHand[$scope.gameState.currentPlayer];
-                var comments, moveValidity;
-                [moveValidity, comments] = shogi.moveValidity($scope.gameState, $scope.firstClick, squareName, playerHand);
+                var moveValidity = shogi.moveValidity($scope.gameState, $scope.firstClick, squareName, playerHand);
 
-                if (moveValidity) {
+                if (moveValidity.validity) {
                     shogi.makeMove($scope.gameState.pieces, $scope.firstClick, squareName, playerHand);
 
-                    if (comments === "drop") {
+                    if (moveValidity.details === "drop") {
                         $scope.gameState.lastMove = ["*" + $scope.gameState.currentPlayer, squareName];
                         $scope.moveCleanup();
                     }
@@ -53,12 +52,22 @@
                     }
                 }
                 else {
-                    var errorType, errorDetails;
-                    [errorType, errorDetails] = comments;
-                    // AJK TODO make this a more generic directive
                     // AJK TODO make the chess one a directive too
-                    if (errorType === "check") {
-                        $scope.gameState.flash = errorDetails;
+                    console.log(moveValidity);
+                    switch(moveValidity.reason) {
+                    case "check":
+                    case "double pawn":
+                        // Flash the offending squares
+                        $scope.gameState.flash = moveValidity.details;
+                        break;
+                    case "out of turn":
+                        // Flash the White/Black to play sign
+                        $scope.gameState.flash = ["current-player"];
+                        break;
+                    case "illegal move":
+                        break;
+                    default:
+                        break;
                     }
                 }
                 // Whether the move is valid or not, deselect the piece.
