@@ -277,7 +277,7 @@ shogi.checkStuck = function(gameState) {
             for (var row = 0; row < rowList.length; row ++) {
                 for (var col = 0; col < colList.length; col++) {
                     endSquare = colList[col] + rowList[row];
-                    if (shogi.moveValidity(gameState, startSquare, endSquare)[0])
+                    if (shogi.moveValidity(gameState, startSquare, endSquare).validity)
                         // If the player can move that piece, they aren't stuck
                         return false;
                 }
@@ -434,7 +434,6 @@ shogi.checkPromotion = function(gameState) {
 shogi.checkMate = function(gameState) {
     if (shogi.checkStuck(gameState)) {
         if (shogi.checkCheck(gameState.pieces, gameState.currentPlayer) === "")
-            // AJK TODO this is being weird. To replicate: make any move
             return "stalemate";
         else return "checkmate";
     }

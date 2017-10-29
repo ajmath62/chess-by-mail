@@ -300,7 +300,7 @@ chess.checkStuck = function(gameState) {
             for (var row = 0; row < rowList.length; row ++) {
                 for (var col = 0; col < colList.length; col++) {
                     endSquare = colList[col] + rowList[row];
-                    if (chess.moveValidity(gameState, startSquare, endSquare)[0])
+                    if (chess.moveValidity(gameState, startSquare, endSquare).validity)
                         // If the player can move that piece, they aren't stuck
                         return false;
                 }
